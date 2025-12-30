@@ -284,8 +284,10 @@ const ClientDetails = () => {
   const [selectedNoteOptions, setSelectedNoteOptions] = useState<Set<string>>(new Set(["Client Notes"]));
   const [craftedNote, setCraftedNote] = useState("");
   const [isAddClientNoteDialogOpen, setIsAddClientNoteDialogOpen] = useState(false);
+  const [noteType, setNoteType] = useState<NoteType>("Client");
   const [noteSummary, setNoteSummary] = useState("");
   const [noteDescription, setNoteDescription] = useState("");
+  const [noteOrigin, setNoteOrigin] = useState<string>("");
   const [notesSearchTerm, setNotesSearchTerm] = useState("");
   const [notesSortBy, setNotesSortBy] = useState<"date" | "type">("date");
   const [notesFilterType, setNotesFilterType] = useState<string>("all");
@@ -7523,10 +7525,66 @@ const ClientDetails = () => {
             </DialogHeader>
 
             <div className="space-y-6">
+              {/* Note Type */}
+              <div className="flex items-start gap-4">
+                <Label htmlFor="note-type" className="text-sm font-medium text-gray-900 mt-2 min-w-[120px]">
+                  Type
+                </Label>
+                <Select value={noteType} onValueChange={(value) => {
+                  setNoteType(value as NoteType);
+                  setNoteOrigin(""); // Reset origin when type changes
+                }}>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Select note type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Client">Client</SelectItem>
+                    <SelectItem value="Plan">Plan</SelectItem>
+                    <SelectItem value="Investment Product">Investment Product</SelectItem>
+                    <SelectItem value="Transaction">Transaction</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Note Origin */}
+              <div className="flex items-start gap-4">
+                <Label htmlFor="note-origin" className="text-sm font-medium text-gray-900 mt-2 min-w-[120px]">
+                  Origin
+                </Label>
+                <Select value={noteOrigin} onValueChange={setNoteOrigin}>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder={`Select ${noteType === "Client" ? "client profile" : noteType === "Plan" ? "plan" : noteType === "Investment Product" ? "investment product" : "transaction"}`} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {noteType === "Client" && (
+                      <SelectItem value="Client Profile">Client Profile</SelectItem>
+                    )}
+                    {noteType === "Plan" && plansList.map((plan) => (
+                      <SelectItem key={plan.id} value={plan.id}>
+                        {plan.accountNumber || plan.id} - {plan.type}
+                      </SelectItem>
+                    ))}
+                    {noteType === "Investment Product" && fundAccounts.map((fund) => (
+                      <SelectItem key={fund.id} value={fund.id}>
+                        {fund.productName || fund.fullName || fund.id}
+                      </SelectItem>
+                    ))}
+                    {noteType === "Transaction" && (
+                      <>
+                        <SelectItem value="trans-001">Deposit - $5,000</SelectItem>
+                        <SelectItem value="trans-002">Withdrawal - $2,000</SelectItem>
+                        <SelectItem value="trans-003">Purchase - $1,500</SelectItem>
+                        <SelectItem value="trans-004">Sale - $3,000</SelectItem>
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Note Summary */}
               <div className="flex items-start gap-4">
                 <Label htmlFor="note-summary" className="text-sm font-medium text-gray-900 mt-2 min-w-[120px]">
-                  Note Summary
+                  Summary
                 </Label>
                 <Input
                   id="note-summary"
@@ -7540,7 +7598,7 @@ const ClientDetails = () => {
               {/* Note Description */}
               <div className="flex items-start gap-4">
                 <Label htmlFor="note-description" className="text-sm font-medium text-gray-900 mt-2 min-w-[120px]">
-                  Note Description
+                  Description
                 </Label>
                 <div className="flex-1 relative">
                   <Textarea
@@ -7564,11 +7622,18 @@ const ClientDetails = () => {
                   className="bg-green-600 hover:bg-green-700 text-white"
                   onClick={() => {
                     // Handle save - you can add logic here to save the note
-                    console.log("Saving note:", { noteSummary, noteDescription });
-                    // TODO: Add save logic
+                    console.log("Saving note:", { 
+                      type: noteType, 
+                      summary: noteSummary, 
+                      description: noteDescription,
+                      origin: noteOrigin 
+                    });
+                    // TODO: Add save logic to add note to allNotes
                     setIsAddClientNoteDialogOpen(false);
+                    setNoteType("Client");
                     setNoteSummary("");
                     setNoteDescription("");
+                    setNoteOrigin("");
                   }}
                 >
                   Save
@@ -7579,8 +7644,10 @@ const ClientDetails = () => {
                   onClick={() => {
                     // Handle cancel - just close the dialog
                     setIsAddClientNoteDialogOpen(false);
+                    setNoteType("Client");
                     setNoteSummary("");
                     setNoteDescription("");
+                    setNoteOrigin("");
                   }}
                 >
                   Cancel
