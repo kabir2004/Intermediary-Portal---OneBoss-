@@ -1689,7 +1689,7 @@ const ClientDetails = () => {
         line1: "P.O. Box 9999",
         line2: "General Mail Services",
         line3: "TORONTO ON M5H 3N3",
-      },
+    },
     contact: {
       home: "555-555-5555",
       cell: "555-555-5555",
@@ -2130,7 +2130,7 @@ const ClientDetails = () => {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="investments" className="space-y-2 mt-2">
+              <TabsContent value="investments" className="space-y-4 mt-2">
                 {Object.values(clientData.summaryData).map((planData: any, planIndex: number) => {
                   const plan = plansList.find(p => p.id === planData.id);
                   if (!plan) return null;
@@ -2149,14 +2149,14 @@ const ClientDetails = () => {
                   };
                   
                   return (
-                    <div key={plan.id} className="border border-gray-300 rounded">
-                      <div className="bg-white text-gray-900 px-3 py-1.5 flex items-center justify-between border-b border-gray-200">
-                        <div className="flex items-center gap-1.5 flex-1">
-                          <Folder className="h-3 w-3" />
-                          <div className="flex-1">
-                            <p className="text-xs">
+                    <div key={plan.id} className="border border-gray-300 rounded bg-white">
+                      <div className="bg-white text-gray-900 px-4 py-2 flex items-center justify-between border-b border-gray-200">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <Folder className="h-3.5 w-3.5 text-gray-600 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-gray-900">
                               <span 
-                                className="underline cursor-pointer"
+                                className="underline cursor-pointer font-medium"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setClientViewTab("portfolio");
@@ -2173,15 +2173,15 @@ const ClientDetails = () => {
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <BarChart3 className="h-3 w-3 cursor-pointer text-gray-700" />
-                          <div className="bg-green-600 p-0.5 rounded">
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <BarChart3 className="h-3.5 w-3.5 cursor-pointer text-gray-700 hover:text-gray-900" />
+                          <div className="bg-green-600 p-1 rounded">
                             <DollarSign className="h-3 w-3 text-white" />
                           </div>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-5 w-5 p-0 text-gray-700 hover:bg-gray-100"
+                            className="h-6 w-6 p-0 text-gray-700 hover:bg-gray-100"
                             onClick={() => {
                               const newCollapsed = new Set(collapsedAccounts);
                               if (newCollapsed.has(accountKey)) {
@@ -2192,22 +2192,23 @@ const ClientDetails = () => {
                               setCollapsedAccounts(newCollapsed);
                             }}
                           >
-                            <Minus className="h-3 w-3" />
+                            <Minus className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       </div>
                       {!isCollapsed && (
-                        <div className="p-2">
+                        <div className="p-4">
                           {/* Investment Details Table */}
+                          <div className="border border-gray-200 rounded overflow-hidden">
                           <Table>
                             <TableHeader>
                               <TableRow className="bg-gray-100">
-                                <TableHead className="text-[10px] font-semibold text-gray-700 py-1.5 px-2">Supplier</TableHead>
-                                <TableHead className="text-[10px] font-semibold text-gray-700 py-1.5 px-2">Account</TableHead>
-                                <TableHead className="text-[10px] font-semibold text-gray-700 py-1.5 px-2">Product</TableHead>
-                                <TableHead className="text-[10px] font-semibold text-gray-700 py-1.5 px-2">Risk</TableHead>
-                                <TableHead className="text-[10px] font-semibold text-gray-700 py-1.5 px-2">Objective</TableHead>
-                                <TableHead className="text-[10px] font-semibold text-gray-700 py-1.5 px-2">Market value</TableHead>
+                                  <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[120px]">Supplier</TableHead>
+                                  <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[140px]">Account</TableHead>
+                                  <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 min-w-[200px]">Product</TableHead>
+                                  <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[80px]">Risk</TableHead>
+                                  <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[150px]">Objective</TableHead>
+                                  <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[130px] text-right">Market value</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -2229,13 +2230,13 @@ const ClientDetails = () => {
                                       setSelectedTransaction(null);
                                     }}
                                   >
-                                    <TableCell className="text-xs py-1.5 px-2">
+                                    <TableCell className="text-xs py-2 px-3">
                                       <span className="font-bold text-blue-600 underline cursor-pointer">{fund.id}</span>
                                     </TableCell>
-                                    <TableCell className="text-xs py-1.5 px-2">{fund.accountNumber || ""}</TableCell>
-                                    <TableCell className="text-xs py-1.5 px-2">{fund.productName}</TableCell>
-                                    <TableCell className="text-xs py-1.5 px-2">{fund.risk}</TableCell>
-                                    <TableCell className="text-xs py-1.5 px-2">
+                                    <TableCell className="text-xs py-2 px-3">{fund.accountNumber || ""}</TableCell>
+                                    <TableCell className="text-xs py-2 px-3">{fund.productName}</TableCell>
+                                    <TableCell className="text-xs py-2 px-3">{fund.risk}</TableCell>
+                                    <TableCell className="text-xs py-2 px-3">
                                       <div className="flex flex-col gap-0.5">
                                         <span>{fund.investmentObjective}</span>
                                         <div className="flex items-center gap-0.5">
@@ -2245,9 +2246,9 @@ const ClientDetails = () => {
                                         </div>
                                       </div>
                                     </TableCell>
-                                    <TableCell className="text-xs font-semibold py-1.5 px-2">
+                                    <TableCell className="text-xs font-semibold py-2 px-3 text-right">
                                       {marketValueNum > 0 ? (
-                                        <div className="flex flex-col gap-0.5">
+                                        <div className="flex flex-col gap-0.5 items-end">
                                           <span>${marketValueFormatted}</span>
                                           <TrendingUp className="h-2.5 w-2.5 text-gray-600" />
                                         </div>
@@ -2260,19 +2261,20 @@ const ClientDetails = () => {
                               })}
                             </TableBody>
                           </Table>
+                          </div>
                           {/* Settled Trust Account Balance */}
-                          <div className="bg-blue-50 mt-2 p-2 rounded">
-                            <div className="flex justify-between items-center mb-1">
+                          <div className="bg-blue-50 mt-4 p-3 rounded border border-blue-200">
+                            <div className="flex justify-between items-center mb-2">
                               <span className="text-xs text-gray-700">Settled Trust Account Balance CAD</span>
-                              <span className="text-xs font-semibold">$0.00</span>
+                              <span className="text-xs font-semibold text-gray-900">$0.00</span>
                             </div>
-                            <div className="flex justify-between items-center mb-1">
+                            <div className="flex justify-between items-center mb-2">
                               <span className="text-xs text-gray-700">Settled Trust Account Balance USD</span>
-                              <span className="text-xs font-semibold">$0.00</span>
+                              <span className="text-xs font-semibold text-gray-900">$0.00</span>
                             </div>
-                            <div className="flex justify-between items-center pt-1 border-t border-blue-200">
+                            <div className="flex justify-between items-center pt-2 border-t border-blue-300">
                               <span className="text-xs font-semibold text-gray-900">Total in CAD</span>
-                              <span className="text-xs font-bold">${planTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              <span className="text-xs font-bold text-gray-900">${planTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             </div>
                           </div>
                         </div>
@@ -4180,52 +4182,52 @@ const ClientDetails = () => {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-gray-100">
-                      <TableHead className="text-xs font-semibold text-gray-700">Supplier</TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-700">Account</TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-700">Product</TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-700">Risk</TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-700">Objective</TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-700">Market value</TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[120px]">Supplier</TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[140px]">Account</TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 min-w-[200px]">Product</TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[80px]">Risk</TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[150px]">Objective</TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[130px] text-right">Market value</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     <TableRow>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-xs py-2 px-3">
                         <span className="font-bold text-blue-600 underline cursor-pointer">MMF-564</span>
                       </TableCell>
-                      <TableCell className="text-sm">6237058732</TableCell>
-                      <TableCell className="text-sm">MANULIFE SIMPLICITY MODERATE PORTFOLIO</TableCell>
-                      <TableCell className="text-sm">LM</TableCell>
-                      <TableCell className="text-sm">
-                        <div className="flex flex-col gap-1">
+                      <TableCell className="text-xs py-2 px-3">6237058732</TableCell>
+                      <TableCell className="text-xs py-2 px-3">MANULIFE SIMPLICITY MODERATE PORTFOLIO</TableCell>
+                      <TableCell className="text-xs py-2 px-3">LM</TableCell>
+                      <TableCell className="text-xs py-2 px-3">
+                        <div className="flex flex-col gap-0.5">
                           <span>75% In, 25% Gr</span>
-                          <div className="flex items-center gap-1">
-                            <FileText className="h-3 w-3 text-blue-600" />
-                            <Folder className="h-3 w-3 text-red-600" />
-                            <Lightbulb className="h-3 w-3 text-yellow-600" />
+                          <div className="flex items-center gap-0.5">
+                            <FileText className="h-2.5 w-2.5 text-blue-600" />
+                            <Folder className="h-2.5 w-2.5 text-red-600" />
+                            <Lightbulb className="h-2.5 w-2.5 text-yellow-600" />
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm font-semibold">$3,747.33</TableCell>
+                      <TableCell className="text-xs font-semibold py-2 px-3 text-right">$3,747.33</TableCell>
                     </TableRow>
                     <TableRow className="bg-blue-50">
-                      <TableCell className="text-sm">
+                      <TableCell className="text-xs py-2 px-3">
                         <span className="font-bold text-blue-600 underline cursor-pointer">MMF-4529</span>
                       </TableCell>
-                      <TableCell className="text-sm">0205734337</TableCell>
-                      <TableCell className="text-sm">MANULIFE DIVIDEND INCOME FUND</TableCell>
-                      <TableCell className="text-sm">M</TableCell>
-                      <TableCell className="text-sm">
-                        <div className="flex flex-col gap-1">
+                      <TableCell className="text-xs py-2 px-3">0205734337</TableCell>
+                      <TableCell className="text-xs py-2 px-3">MANULIFE DIVIDEND INCOME FUND</TableCell>
+                      <TableCell className="text-xs py-2 px-3">M</TableCell>
+                      <TableCell className="text-xs py-2 px-3">
+                        <div className="flex flex-col gap-0.5">
                           <span>100% Ba</span>
-                          <div className="flex items-center gap-1">
-                            <FileText className="h-3 w-3 text-blue-600" />
-                            <Folder className="h-3 w-3 text-red-600" />
-                            <Lightbulb className="h-3 w-3 text-yellow-600" />
+                          <div className="flex items-center gap-0.5">
+                            <FileText className="h-2.5 w-2.5 text-blue-600" />
+                            <Folder className="h-2.5 w-2.5 text-red-600" />
+                            <Lightbulb className="h-2.5 w-2.5 text-yellow-600" />
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm font-semibold">$11,466.96</TableCell>
+                      <TableCell className="text-xs font-semibold py-2 px-3 text-right">$11,466.96</TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
