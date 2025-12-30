@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, AreaChart, Area, LineChart, Line } from "recharts";
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -69,8 +69,26 @@ import {
   Info,
   Building2,
   Eye,
+  Mic,
+  Package,
+  ArrowRight,
 } from "lucide-react";
 import { CLIENTS } from "./Clients";
+
+// Note type definition
+type NoteType = "Client" | "Plan" | "Investment Product" | "Transaction";
+
+interface Note {
+  id: string;
+  type: NoteType;
+  summary: string;
+  description: string;
+  date: string;
+  originId: string; // ID of the originating level (plan ID, transaction ID, etc.)
+  originName: string; // Name/description of the originating level
+  attachments?: string[];
+  createdBy?: string;
+}
 
 // Available fund companies
 const FUND_COMPANIES = [
@@ -262,6 +280,509 @@ const ClientDetails = () => {
   const [standaloneAmount, setStandaloneAmount] = useState("");
   const [portfolioSubTab, setPortfolioSubTab] = useState<"investments" | "cash" | "recent-trading" | "product-documents">("investments");
   const [collapsedAccounts, setCollapsedAccounts] = useState<Set<string>>(new Set());
+  const [showAdditionalNotesOptions, setShowAdditionalNotesOptions] = useState(false);
+  const [selectedNoteOptions, setSelectedNoteOptions] = useState<Set<string>>(new Set(["Client Notes"]));
+  const [craftedNote, setCraftedNote] = useState("");
+  const [isAddClientNoteDialogOpen, setIsAddClientNoteDialogOpen] = useState(false);
+  const [noteSummary, setNoteSummary] = useState("");
+  const [noteDescription, setNoteDescription] = useState("");
+  const [notesSearchTerm, setNotesSearchTerm] = useState("");
+  const [notesSortBy, setNotesSortBy] = useState<"date" | "type">("date");
+  const [notesFilterType, setNotesFilterType] = useState<string>("all");
+
+  // Get client-specific notes
+  const getClientNotes = (clientId: string | undefined): Note[] => {
+    if (!clientId) return [];
+
+    const notesMap: Record<string, Note[]> = {
+      "CL001": [
+        {
+          id: "note1-cl001",
+          type: "Client",
+          summary: "Initial client meeting with John Smith",
+          description: "Discussed investment goals and risk tolerance. Client prefers conservative approach with focus on long-term growth.",
+          date: "2024-01-15T10:30:00",
+          originId: clientId,
+          originName: "Client Profile",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note2-cl001",
+          type: "Plan",
+          summary: "RRIF account review",
+          description: "Reviewed RRIF account performance. Client satisfied with current allocation. Discussed withdrawal strategy for upcoming year.",
+          date: "2024-02-20T14:15:00",
+          originId: "0137617685",
+          originName: "0137617685",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note3-cl001",
+          type: "Transaction",
+          summary: "Monthly contribution",
+          description: "Client made monthly contribution of $500 to RRIF account as per scheduled plan.",
+          date: "2024-03-10T09:00:00",
+          originId: "trans-cl001-001",
+          originName: "Deposit - $500",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note4-cl001",
+          type: "Investment Product",
+          summary: "Mackenzie fund performance",
+          description: "Reviewed Mackenzie Bluewater Canadian Growth Balanced Fund performance. Client satisfied with returns and risk profile.",
+          date: "2024-03-25T11:45:00",
+          originId: "MFC-724",
+          originName: "MACKENZIE BLUEWATER CANADIAN GROWTH BALANCED FUND",
+          createdBy: "Marsh, Antoine",
+        },
+      ],
+      "CL002": [
+        {
+          id: "note1-cl002",
+          type: "Client",
+          summary: "Initial consultation with Sarah Johnson",
+          description: "Met with client to discuss investment objectives. Client is interested in balanced portfolio with moderate risk tolerance.",
+          date: "2024-01-20T11:00:00",
+          originId: clientId,
+          originName: "Client Profile",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note2-cl002",
+          type: "Plan",
+          summary: "TFSA account goal",
+          description: "Client's goal is to purchase a car once this account reaches $60K. Currently at $45K, on track to reach goal in 18 months.",
+          date: "2024-02-20T14:15:00",
+          originId: "TFSA-7892",
+          originName: "TFSA-7892",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note3-cl002",
+          type: "Transaction",
+          summary: "Birthday gift from parents",
+          description: "Client received $5,000 as a birthday gift from parents. Deposited into TFSA account as per client's request.",
+          date: "2024-03-10T09:00:00",
+          originId: "trans-cl002-001",
+          originName: "Deposit - $5,000",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note4-cl002",
+          type: "Investment Product",
+          summary: "TD fund performance discussion",
+          description: "Reviewed TD Canadian Equity Fund performance with client. Client satisfied with returns and wants to maintain position.",
+          date: "2024-03-25T11:45:00",
+          originId: "TD-1234",
+          originName: "TD CANADIAN EQUITY FUND",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note5-cl002",
+          type: "Plan",
+          summary: "RRSP contribution limit",
+          description: "Discussed RRSP contribution limits and tax implications for the current year. Client plans to maximize contribution.",
+          date: "2024-04-05T13:20:00",
+          originId: "RRSP-4521",
+          originName: "RRSP-4521",
+          createdBy: "Marsh, Antoine",
+        },
+      ],
+      "CL005": [
+        {
+          id: "note1-cl005",
+          type: "Client",
+          summary: "Meeting with Robert Wilson",
+          description: "Initial meeting to discuss RESP account for children's education. Client wants aggressive growth strategy.",
+          date: "2024-01-25T09:30:00",
+          originId: clientId,
+          originName: "Client Profile",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note2-cl005",
+          type: "Plan",
+          summary: "RESP account strategy",
+          description: "Discussed RESP contribution strategy. Client wants to maximize government grants. Plan to contribute $2,500 annually per child.",
+          date: "2024-02-15T10:00:00",
+          originId: "RESP-3456",
+          originName: "RESP-3456",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note3-cl005",
+          type: "Investment Product",
+          summary: "CIBC Dividend Fund review",
+          description: "Client inquired about CIBC Dividend Fund. Reviewed fund performance and suitability for RESP account.",
+          date: "2024-03-18T14:30:00",
+          originId: "CIBC-2468",
+          originName: "CIBC DIVIDEND FUND",
+          createdBy: "Marsh, Antoine",
+        },
+      ],
+      "CL006": [
+        {
+          id: "note1-cl006",
+          type: "Client",
+          summary: "Consultation with Elton Andrews",
+          description: "Client is new to investing. Discussed basic investment concepts and risk tolerance. Recommended starting with conservative approach.",
+          date: "2024-02-01T10:00:00",
+          originId: clientId,
+          originName: "Client Profile",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note2-cl006",
+          type: "Plan",
+          summary: "Non-registered account setup",
+          description: "Set up non-registered account for client. Discussed tax implications and investment strategy.",
+          date: "2024-02-10T11:15:00",
+          originId: "NR-7890",
+          originName: "NR-7890",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note3-cl006",
+          type: "Transaction",
+          summary: "Initial deposit",
+          description: "Client made initial deposit of $10,000 to non-registered account.",
+          date: "2024-02-12T09:00:00",
+          originId: "trans-cl006-001",
+          originName: "Deposit - $10,000",
+          createdBy: "Marsh, Antoine",
+        },
+      ],
+      "CL007": [
+        {
+          id: "note1-cl007",
+          type: "Client",
+          summary: "Meeting with Francoise Andrews",
+          description: "Client is experienced investor. Discussed portfolio rebalancing and tax-efficient strategies.",
+          date: "2024-01-18T13:00:00",
+          originId: clientId,
+          originName: "Client Profile",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note2-cl007",
+          type: "Plan",
+          summary: "LIF account withdrawal",
+          description: "Discussed LIF minimum withdrawal requirements. Client wants to take minimum to preserve capital.",
+          date: "2024-02-25T10:30:00",
+          originId: "LIF-2345",
+          originName: "LIF-2345",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note3-cl007",
+          type: "Investment Product",
+          summary: "Manulife fund performance",
+          description: "Reviewed Manulife Canadian Equity Fund. Client satisfied with performance and wants to maintain position.",
+          date: "2024-03-20T11:00:00",
+          originId: "MANULIFE-1111",
+          originName: "MANULIFE CANADIAN EQUITY FUND",
+          createdBy: "Marsh, Antoine",
+        },
+      ],
+      "CL008": [
+        {
+          id: "note1-cl008",
+          type: "Client",
+          summary: "Initial meeting with Amy Armstrong",
+          description: "Client is interested in building wealth through diversified portfolio. Discussed long-term investment strategy.",
+          date: "2024-01-22T14:00:00",
+          originId: clientId,
+          originName: "Client Profile",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note2-cl008",
+          type: "Plan",
+          summary: "TFSA contribution strategy",
+          description: "Client wants to maximize TFSA contributions annually. Discussed contribution room and investment options.",
+          date: "2024-02-28T10:15:00",
+          originId: "TFSA-4567",
+          originName: "TFSA-4567",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note3-cl008",
+          type: "Investment Product",
+          summary: "IG Wealth fund discussion",
+          description: "Client inquired about IG Wealth Global Equity Fund. Reviewed fund details and suitability.",
+          date: "2024-03-15T13:30:00",
+          originId: "IG-3333",
+          originName: "IG WEALTH GLOBAL EQUITY FUND",
+          createdBy: "Marsh, Antoine",
+        },
+      ],
+      "CL009": [
+        {
+          id: "note1-cl009",
+          type: "Client",
+          summary: "Consultation with David Thompson",
+          description: "Client is tech professional with high risk tolerance. Interested in technology-focused investments.",
+          date: "2024-01-30T11:00:00",
+          originId: clientId,
+          originName: "Client Profile",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note2-cl009",
+          type: "Plan",
+          summary: "DCPP account review",
+          description: "Reviewed DCPP account performance. Client wants to increase contribution rate.",
+          date: "2024-03-05T09:45:00",
+          originId: "DCPP-6789",
+          originName: "DCPP-6789",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note3-cl009",
+          type: "Investment Product",
+          summary: "TD Technology Fund performance",
+          description: "Client satisfied with TD Global Technology Fund performance. Discussed adding more technology exposure.",
+          date: "2024-04-10T14:20:00",
+          originId: "TD-6666",
+          originName: "TD GLOBAL TECHNOLOGY FUND",
+          createdBy: "Marsh, Antoine",
+        },
+      ],
+      "CL011": [
+        {
+          id: "note1-cl011",
+          type: "Client",
+          summary: "Meeting with James Brown",
+          description: "Client is retired and focused on income generation. Discussed conservative income-focused strategy.",
+          date: "2024-01-12T10:00:00",
+          originId: clientId,
+          originName: "Client Profile",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note2-cl011",
+          type: "Plan",
+          summary: "RRIF withdrawal strategy",
+          description: "Discussed RRIF minimum withdrawal requirements and tax implications. Client wants to minimize tax impact.",
+          date: "2024-02-08T11:30:00",
+          originId: "RRIF-9012",
+          originName: "RRIF-9012",
+          createdBy: "Marsh, Antoine",
+        },
+        {
+          id: "note3-cl011",
+          type: "Transaction",
+          summary: "Quarterly withdrawal",
+          description: "Client made quarterly RRIF withdrawal of $3,000 as per minimum requirement.",
+          date: "2024-03-01T09:00:00",
+          originId: "trans-cl011-001",
+          originName: "Withdrawal - $3,000",
+          createdBy: "Marsh, Antoine",
+        },
+      ],
+    };
+
+    // Default notes for clients not in the map
+    return notesMap[clientId] || [
+      {
+        id: `note-default-${clientId}`,
+        type: "Client",
+        summary: "Client profile created",
+        description: "Initial client profile setup and onboarding completed.",
+        date: new Date().toISOString(),
+        originId: clientId || "",
+        originName: "Client Profile",
+        createdBy: "Marsh, Antoine",
+      },
+    ];
+  };
+
+  const allNotes = useMemo(() => getClientNotes(id), [id]);
+
+  // Filter and sort notes
+  const filteredAndSortedNotes = useMemo(() => {
+    let filtered = allNotes;
+
+    // Filter by type
+    if (notesFilterType !== "all") {
+      filtered = filtered.filter((note) => note.type === notesFilterType);
+    }
+
+    // Search filter
+    if (notesSearchTerm) {
+      const term = notesSearchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (note) =>
+          note.summary.toLowerCase().includes(term) ||
+          note.description.toLowerCase().includes(term) ||
+          note.originName.toLowerCase().includes(term)
+      );
+    }
+
+    // Sort
+    const sorted = [...filtered].sort((a, b) => {
+      if (notesSortBy === "date") {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      } else {
+        return a.type.localeCompare(b.type);
+      }
+    });
+
+    return sorted;
+  }, [allNotes, notesSearchTerm, notesSortBy, notesFilterType]);
+
+  // Get icon for note type
+  const getNoteTypeIcon = (type: NoteType) => {
+    switch (type) {
+      case "Client":
+        return <User className="h-4 w-4" />;
+      case "Plan":
+        return <Folder className="h-4 w-4" />;
+      case "Investment Product":
+        return <Package className="h-4 w-4" />;
+      case "Transaction":
+        return <ArrowLeftRight className="h-4 w-4" />;
+      default:
+        return <FileText className="h-4 w-4" />;
+    }
+  };
+
+  // Navigate to originating level
+  const navigateToOrigin = (note: Note) => {
+    switch (note.type) {
+      case "Client":
+        setClientViewTab("summary");
+        break;
+      case "Plan":
+        setClientViewTab("investments");
+        setSelectedPlanForDetails(note.originId);
+        break;
+      case "Investment Product":
+        setClientViewTab("investments");
+        setSelectedFundAccount(note.originId);
+        break;
+      case "Transaction":
+        setClientViewTab("investments");
+        setSelectedTransaction(note.originId);
+        break;
+    }
+  };
+
+  // Note options based on the image
+  const noteOptions = [
+    "Client Notes",
+    "Fund Account Notes",
+    "Plan Reviews",
+    "GIC Transaction Notes",
+    "ETF Transaction Reviews",
+    "Include Account Opening Notes",
+    "Emails Sent to Client",
+    "GIC Notes",
+    "Fund Transaction Notes",
+    "GIC Transaction Reviews",
+    "Include Inactive Plans and Accounts",
+    "Plan Notes",
+    "ETF Account Notes",
+    "Fund Transaction Reviews",
+    "ETF Transaction Notes",
+    "Include KYC Update Notes",
+  ];
+
+  // Handle checkbox toggle
+  const toggleNoteOption = (option: string) => {
+    const newSelected = new Set(selectedNoteOptions);
+    if (newSelected.has(option)) {
+      newSelected.delete(option);
+    } else {
+      newSelected.add(option);
+    }
+    setSelectedNoteOptions(newSelected);
+  };
+
+  // Select all options
+  const selectAllOptions = () => {
+    setSelectedNoteOptions(new Set(noteOptions));
+  };
+
+  // Deselect all options
+  const deselectAllOptions = () => {
+    setSelectedNoteOptions(new Set());
+  };
+
+  // Craft note based on selected options
+  const craftNoteFromOptions = () => {
+    if (selectedNoteOptions.size === 0) {
+      setCraftedNote("");
+      return;
+    }
+
+    const selectedArray = Array.from(selectedNoteOptions);
+    const noteParts: string[] = [];
+
+    // Group related options
+    if (selectedArray.includes("Client Notes")) {
+      noteParts.push("Client Notes: General client information and interactions.");
+    }
+    if (selectedArray.includes("Plan Notes")) {
+      noteParts.push("Plan Notes: Details regarding client plans and account structures.");
+    }
+    if (selectedArray.includes("Plan Reviews")) {
+      noteParts.push("Plan Reviews: Comprehensive review of plan performance and status.");
+    }
+    if (selectedArray.includes("Fund Account Notes")) {
+      noteParts.push("Fund Account Notes: Information specific to fund accounts.");
+    }
+    if (selectedArray.includes("ETF Account Notes")) {
+      noteParts.push("ETF Account Notes: Details related to ETF account holdings.");
+    }
+    if (selectedArray.includes("GIC Notes")) {
+      noteParts.push("GIC Notes: Information about GIC investments and terms.");
+    }
+    if (selectedArray.includes("Fund Transaction Notes")) {
+      noteParts.push("Fund Transaction Notes: Records of fund-related transactions.");
+    }
+    if (selectedArray.includes("Fund Transaction Reviews")) {
+      noteParts.push("Fund Transaction Reviews: Analysis of fund transaction history.");
+    }
+    if (selectedArray.includes("GIC Transaction Notes")) {
+      noteParts.push("GIC Transaction Notes: Details of GIC transaction activities.");
+    }
+    if (selectedArray.includes("GIC Transaction Reviews")) {
+      noteParts.push("GIC Transaction Reviews: Review of GIC transaction patterns.");
+    }
+    if (selectedArray.includes("ETF Transaction Notes")) {
+      noteParts.push("ETF Transaction Notes: Information about ETF transactions.");
+    }
+    if (selectedArray.includes("ETF Transaction Reviews")) {
+      noteParts.push("ETF Transaction Reviews: Analysis of ETF transaction history.");
+    }
+    if (selectedArray.includes("Emails Sent to Client")) {
+      noteParts.push("Emails Sent to Client: Communication records and email correspondence.");
+    }
+    if (selectedArray.includes("Include Account Opening Notes")) {
+      noteParts.push("Account Opening Notes: Documentation from account establishment.");
+    }
+    if (selectedArray.includes("Include Inactive Plans and Accounts")) {
+      noteParts.push("Inactive Plans and Accounts: Information regarding closed or inactive accounts.");
+    }
+    if (selectedArray.includes("Include KYC Update Notes")) {
+      noteParts.push("KYC Update Notes: Know Your Client documentation and updates.");
+    }
+
+    const crafted = noteParts.join("\n\n");
+    setCraftedNote(crafted);
+  };
+
+  // Update crafted note when selections change
+  useEffect(() => {
+    if (showAdditionalNotesOptions && selectedNoteOptions.size > 0) {
+      craftNoteFromOptions();
+    } else if (selectedNoteOptions.size === 0) {
+      setCraftedNote("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedNoteOptions, showAdditionalNotesOptions]);
   
   // Client-specific data mapping
   const getClientData = (clientId: string | undefined) => {
@@ -6620,51 +7141,454 @@ const ClientDetails = () => {
               
               {/* Action Buttons Row */}
               <div className="flex items-center gap-4 mb-4 flex-wrap">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => setIsAddClientNoteDialogOpen(true)}
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Add Client Note
                 </Button>
                 
                 <div className="flex items-center gap-2 flex-1 min-w-[300px]">
-                  <div className="relative flex-1">
-                    <Input
-                      placeholder="View Additional Notes"
-                      className="pr-8"
-                    />
+                  <div className="relative flex-1 min-h-[40px] border border-gray-300 rounded-md bg-white px-2 py-1.5 flex flex-wrap items-center gap-1.5">
+                    {selectedNoteOptions.size > 0 ? (
+                      Array.from(selectedNoteOptions).map((option) => (
+                        <Badge
+                          key={option}
+                          variant="secondary"
+                          className="bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs px-2 py-0.5 flex items-center gap-1"
+                        >
+                          <span>{option}</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleNoteOption(option);
+                            }}
+                            className="ml-1 hover:bg-blue-300 rounded-full p-0.5 transition-colors"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-sm text-gray-400">View Additional Notes</span>
+                    )}
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 text-blue-600 hover:text-blue-700"
+                      className="h-6 w-6 p-0 text-blue-600 hover:text-blue-700 ml-auto"
+                      onClick={() => setShowAdditionalNotesOptions(!showAdditionalNotesOptions)}
                     >
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
-                  <Button variant="outline" size="sm" className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
+                    onClick={selectAllOptions}
+                  >
                     All
                   </Button>
-                  <Button variant="outline" size="sm" className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
+                    onClick={deselectAllOptions}
+                  >
                     None
                   </Button>
                 </div>
               </div>
+
+              {/* Additional Notes Options Panel */}
+              {showAdditionalNotesOptions && (
+                <Card className="border border-gray-200 shadow-sm mb-4 bg-gray-50">
+                  <CardContent className="p-4">
+                    <div className="grid grid-cols-3 gap-4">
+                      {/* Column 1 */}
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="client-notes"
+                            checked={selectedNoteOptions.has("Client Notes")}
+                            onCheckedChange={() => toggleNoteOption("Client Notes")}
+                          />
+                          <Label htmlFor="client-notes" className="text-sm text-gray-900 cursor-pointer">
+                            Client Notes
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="fund-account-notes"
+                            checked={selectedNoteOptions.has("Fund Account Notes")}
+                            onCheckedChange={() => toggleNoteOption("Fund Account Notes")}
+                          />
+                          <Label htmlFor="fund-account-notes" className="text-sm text-gray-900 cursor-pointer">
+                            Fund Account Notes
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="plan-reviews"
+                            checked={selectedNoteOptions.has("Plan Reviews")}
+                            onCheckedChange={() => toggleNoteOption("Plan Reviews")}
+                          />
+                          <Label htmlFor="plan-reviews" className="text-sm text-gray-900 cursor-pointer">
+                            Plan Reviews
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="gic-transaction-notes"
+                            checked={selectedNoteOptions.has("GIC Transaction Notes")}
+                            onCheckedChange={() => toggleNoteOption("GIC Transaction Notes")}
+                          />
+                          <Label htmlFor="gic-transaction-notes" className="text-sm text-gray-900 cursor-pointer">
+                            GIC Transaction Notes
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="etf-transaction-reviews"
+                            checked={selectedNoteOptions.has("ETF Transaction Reviews")}
+                            onCheckedChange={() => toggleNoteOption("ETF Transaction Reviews")}
+                          />
+                          <Label htmlFor="etf-transaction-reviews" className="text-sm text-gray-900 cursor-pointer">
+                            ETF Transaction Reviews
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="include-account-opening-notes"
+                            checked={selectedNoteOptions.has("Include Account Opening Notes")}
+                            onCheckedChange={() => toggleNoteOption("Include Account Opening Notes")}
+                          />
+                          <Label htmlFor="include-account-opening-notes" className="text-sm text-gray-900 cursor-pointer">
+                            Include Account Opening Notes
+                          </Label>
+                        </div>
+                      </div>
+
+                      {/* Column 2 */}
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="emails-sent-to-client"
+                            checked={selectedNoteOptions.has("Emails Sent to Client")}
+                            onCheckedChange={() => toggleNoteOption("Emails Sent to Client")}
+                          />
+                          <Label htmlFor="emails-sent-to-client" className="text-sm text-gray-900 cursor-pointer">
+                            Emails Sent to Client
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="gic-notes"
+                            checked={selectedNoteOptions.has("GIC Notes")}
+                            onCheckedChange={() => toggleNoteOption("GIC Notes")}
+                          />
+                          <Label htmlFor="gic-notes" className="text-sm text-gray-900 cursor-pointer">
+                            GIC Notes
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="fund-transaction-notes"
+                            checked={selectedNoteOptions.has("Fund Transaction Notes")}
+                            onCheckedChange={() => toggleNoteOption("Fund Transaction Notes")}
+                          />
+                          <Label htmlFor="fund-transaction-notes" className="text-sm text-gray-900 cursor-pointer">
+                            Fund Transaction Notes
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="gic-transaction-reviews"
+                            checked={selectedNoteOptions.has("GIC Transaction Reviews")}
+                            onCheckedChange={() => toggleNoteOption("GIC Transaction Reviews")}
+                          />
+                          <Label htmlFor="gic-transaction-reviews" className="text-sm text-gray-900 cursor-pointer">
+                            GIC Transaction Reviews
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="include-inactive-plans-accounts"
+                            checked={selectedNoteOptions.has("Include Inactive Plans and Accounts")}
+                            onCheckedChange={() => toggleNoteOption("Include Inactive Plans and Accounts")}
+                          />
+                          <Label htmlFor="include-inactive-plans-accounts" className="text-sm text-gray-900 cursor-pointer">
+                            Include Inactive Plans and Accounts
+                          </Label>
+                        </div>
+                      </div>
+
+                      {/* Column 3 */}
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="plan-notes"
+                            checked={selectedNoteOptions.has("Plan Notes")}
+                            onCheckedChange={() => toggleNoteOption("Plan Notes")}
+                          />
+                          <Label htmlFor="plan-notes" className="text-sm text-gray-900 cursor-pointer">
+                            Plan Notes
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="etf-account-notes"
+                            checked={selectedNoteOptions.has("ETF Account Notes")}
+                            onCheckedChange={() => toggleNoteOption("ETF Account Notes")}
+                          />
+                          <Label htmlFor="etf-account-notes" className="text-sm text-gray-900 cursor-pointer">
+                            ETF Account Notes
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="fund-transaction-reviews"
+                            checked={selectedNoteOptions.has("Fund Transaction Reviews")}
+                            onCheckedChange={() => toggleNoteOption("Fund Transaction Reviews")}
+                          />
+                          <Label htmlFor="fund-transaction-reviews" className="text-sm text-gray-900 cursor-pointer">
+                            Fund Transaction Reviews
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="etf-transaction-notes"
+                            checked={selectedNoteOptions.has("ETF Transaction Notes")}
+                            onCheckedChange={() => toggleNoteOption("ETF Transaction Notes")}
+                          />
+                          <Label htmlFor="etf-transaction-notes" className="text-sm text-gray-900 cursor-pointer">
+                            ETF Transaction Notes
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="include-kyc-update-notes"
+                            checked={selectedNoteOptions.has("Include KYC Update Notes")}
+                            onCheckedChange={() => toggleNoteOption("Include KYC Update Notes")}
+                          />
+                          <Label htmlFor="include-kyc-update-notes" className="text-sm text-gray-900 cursor-pointer">
+                            Include KYC Update Notes
+                          </Label>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
               
-              {/* Print Notes Button */}
-              <div className="mb-6">
+              {/* Search and Filter Controls */}
+              <div className="mb-6 flex items-center gap-4 flex-wrap">
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Search notes..."
+                    value={notesSearchTerm}
+                    onChange={(e) => setNotesSearchTerm(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                <Select value={notesSortBy} onValueChange={(value) => setNotesSortBy(value as "date" | "type")}>
+                  <SelectTrigger className="w-[150px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date">Sort by Date</SelectItem>
+                    <SelectItem value="type">Sort by Type</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={notesFilterType} onValueChange={setNotesFilterType}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Note Types</SelectItem>
+                    <SelectItem value="Client">Client Notes</SelectItem>
+                    <SelectItem value="Plan">Plan Notes</SelectItem>
+                    <SelectItem value="Investment Product">Investment Product</SelectItem>
+                    <SelectItem value="Transaction">Transaction Notes</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Button variant="outline" size="sm" className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100">
                   <FileText className="h-4 w-4 mr-2" />
                   Print Notes
                 </Button>
               </div>
 
-              {/* Notes List - Placeholder for now */}
+              {/* Notes Table */}
               <Card className="border border-gray-200 shadow-sm">
-                <CardContent className="p-6">
-                  <p className="text-sm text-gray-500 text-center">No notes available. Click "Add Client Note" to create one.</p>
+                <CardContent className="p-0">
+                  {filteredAndSortedNotes.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-[140px]">Date & Time</TableHead>
+                            <TableHead className="w-[80px]">Type</TableHead>
+                            <TableHead>Summary</TableHead>
+                            <TableHead>Description</TableHead>
+                            <TableHead className="w-[150px]">Origin</TableHead>
+                            <TableHead className="w-[120px]">Created By</TableHead>
+                            <TableHead className="w-[100px]">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {filteredAndSortedNotes.map((note) => (
+                            <TableRow key={note.id} className="hover:bg-gray-50">
+                              <TableCell className="text-sm">
+                                <div className="space-y-0.5">
+                                  <div className="font-medium text-gray-900">
+                                    {new Date(note.date).toLocaleDateString("en-CA", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    })}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {new Date(note.date).toLocaleTimeString("en-CA", {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                      hour12: true,
+                                    }).toLowerCase()}
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="flex items-center justify-center">
+                                      <div className="p-1.5 bg-blue-100 rounded text-blue-700">
+                                        {getNoteTypeIcon(note.type)}
+                                      </div>
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{note.type}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TableCell>
+                              <TableCell className="font-semibold text-sm text-gray-900">
+                                {note.summary}
+                              </TableCell>
+                              <TableCell className="text-sm text-gray-700">
+                                {note.description}
+                              </TableCell>
+                              <TableCell className="text-sm font-medium text-gray-900">
+                                {note.originName}
+                              </TableCell>
+                              <TableCell className="text-sm text-gray-600">
+                                {note.createdBy || "N/A"}
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                  onClick={() => navigateToOrigin(note)}
+                                >
+                                  <ArrowRight className="h-4 w-4 mr-1" />
+                                  Go to
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  ) : (
+                    <div className="p-6 text-center">
+                      <p className="text-sm text-gray-500">
+                        {notesSearchTerm || notesFilterType !== "all"
+                          ? "No notes match your search criteria."
+                          : "No notes available. Click 'Add Client Note' to create one."}
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
           </div>
         )}
+
+        {/* Add Client Note Dialog */}
+        <Dialog open={isAddClientNoteDialogOpen} onOpenChange={setIsAddClientNoteDialogOpen}>
+          <DialogContent className="bg-gray-50 max-w-2xl">
+            <DialogHeader className="mb-4">
+              <DialogTitle className="text-lg font-semibold text-gray-900">Add Client Note</DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-6">
+              {/* Note Summary */}
+              <div className="flex items-start gap-4">
+                <Label htmlFor="note-summary" className="text-sm font-medium text-gray-900 mt-2 min-w-[120px]">
+                  Note Summary
+                </Label>
+                <Input
+                  id="note-summary"
+                  value={noteSummary}
+                  onChange={(e) => setNoteSummary(e.target.value)}
+                  placeholder="Enter note summary"
+                  className="flex-1"
+                />
+              </div>
+
+              {/* Note Description */}
+              <div className="flex items-start gap-4">
+                <Label htmlFor="note-description" className="text-sm font-medium text-gray-900 mt-2 min-w-[120px]">
+                  Note Description
+                </Label>
+                <div className="flex-1 relative">
+                  <Textarea
+                    id="note-description"
+                    value={noteDescription}
+                    onChange={(e) => setNoteDescription(e.target.value)}
+                    placeholder="Enter note description"
+                    className="min-h-[150px] pr-12"
+                  />
+                  <div className="absolute top-3 right-3 flex flex-col items-center gap-0.5 cursor-pointer hover:opacity-70 transition-opacity">
+                    <Mic className="h-4 w-4 text-gray-600" />
+                    <span className="text-[7px] font-medium text-gray-500 leading-tight tracking-tight">BETA</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="mt-6">
+              <div className="flex gap-3">
+                <Button
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => {
+                    // Handle save - you can add logic here to save the note
+                    console.log("Saving note:", { noteSummary, noteDescription });
+                    // TODO: Add save logic
+                    setIsAddClientNoteDialogOpen(false);
+                    setNoteSummary("");
+                    setNoteDescription("");
+                  }}
+                >
+                  Save
+                </Button>
+                <Button
+                  variant="outline"
+                  className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
+                  onClick={() => {
+                    // Handle cancel - just close the dialog
+                    setIsAddClientNoteDialogOpen(false);
+                    setNoteSummary("");
+                    setNoteDescription("");
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {clientViewTab === "approvals" && (
           <div className="space-y-4">
