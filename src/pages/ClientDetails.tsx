@@ -1384,12 +1384,6 @@ const ClientDetails = () => {
               )}
             </CardHeader>
             <CardContent className="pt-0">
-              <p className="text-sm text-gray-700">{clientDetails.mailingAddress.line1}</p>
-              {clientDetails.mailingAddress.line2 && (
-                <p className="text-sm text-gray-700">{clientDetails.mailingAddress.line2}</p>
-              )}
-              <p className="text-sm text-gray-700">{clientDetails.mailingAddress.city}, {clientDetails.mailingAddress.province}</p>
-              <p className="text-sm text-gray-700">{clientDetails.mailingAddress.postalCode}</p>
               <p className="text-sm text-gray-700 mt-2">Home: {clientDetails.contact.home}</p>
               <p className="text-sm text-gray-700">Cell: {clientDetails.contact.cell}</p>
             </CardContent>
