@@ -291,6 +291,8 @@ const ClientDetails = () => {
   const [notesSearchTerm, setNotesSearchTerm] = useState("");
   const [notesSortBy, setNotesSortBy] = useState<"date" | "type">("date");
   const [notesFilterType, setNotesFilterType] = useState<string>("all");
+  const [selectedNoteForView, setSelectedNoteForView] = useState<Note | null>(null);
+  const [isNoteDetailDialogOpen, setIsNoteDetailDialogOpen] = useState(false);
 
   // Get client-specific notes
   const getClientNotes = (clientId: string | undefined): Note[] => {
@@ -600,7 +602,13 @@ const ClientDetails = () => {
     ];
   };
 
-  const allNotes = useMemo(() => getClientNotes(id), [id]);
+  const [allNotes, setAllNotes] = useState<Note[]>(() => getClientNotes(id));
+
+  // Update notes when client changes
+  useEffect(() => {
+    setAllNotes(getClientNotes(id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   // Filter and sort notes
   const filteredAndSortedNotes = useMemo(() => {
@@ -650,25 +658,11 @@ const ClientDetails = () => {
     }
   };
 
-  // Navigate to originating level
+  // Show note details popup
   const navigateToOrigin = (note: Note) => {
-    switch (note.type) {
-      case "Client":
-        setClientViewTab("summary");
-        break;
-      case "Plan":
-        setClientViewTab("investments");
-        setSelectedPlanForDetails(note.originId);
-        break;
-      case "Investment Product":
-        setClientViewTab("investments");
-        setSelectedFundAccount(note.originId);
-        break;
-      case "Transaction":
-        setClientViewTab("investments");
-        setSelectedTransaction(note.originId);
-        break;
-    }
+    // Show note details popup only - stay on the notes page
+    setSelectedNoteForView(note);
+    setIsNoteDetailDialogOpen(true);
   };
 
   // Note options based on the image
@@ -1229,7 +1223,7 @@ const ClientDetails = () => {
           line2: "Unit 12B",
           line3: "TORONTO ON M4B 1K3",
         },
-        mailingAddress: {
+    mailingAddress: {
           line1: "P.O. Box 1234",
           line2: "Mail Service Centre",
           line3: "TORONTO ON M5H 2N2",
@@ -1687,20 +1681,20 @@ const ClientDetails = () => {
     // Default fallback if client ID not found
     return contactInfoMap[clientId || ""] || {
       residentialAddress: {
-        line1: "123 Main Street",
-        line2: "Suite 200",
-        line3: "TORONTO ON M5H 2N2",
-      },
+      line1: "123 Main Street",
+      line2: "Suite 200",
+      line3: "TORONTO ON M5H 2N2",
+    },
       mailingAddress: {
         line1: "P.O. Box 9999",
         line2: "General Mail Services",
         line3: "TORONTO ON M5H 3N3",
       },
-      contact: {
-        home: "555-555-5555",
-        cell: "555-555-5555",
-        email: "client@onebosstest.com",
-      },
+    contact: {
+      home: "555-555-5555",
+      cell: "555-555-5555",
+      email: "client@onebosstest.com",
+    },
     };
   };
 
@@ -7202,7 +7196,7 @@ const ClientDetails = () => {
                   </Button>
                 </div>
               </div>
-
+              
               {/* Additional Notes Options Panel */}
               {showAdditionalNotesOptions && (
                 <Card className="border border-gray-200 shadow-sm mb-4 bg-gray-50">
@@ -7621,14 +7615,47 @@ const ClientDetails = () => {
                 <Button
                   className="bg-green-600 hover:bg-green-700 text-white"
                   onClick={() => {
-                    // Handle save - you can add logic here to save the note
-                    console.log("Saving note:", { 
-                      type: noteType, 
-                      summary: noteSummary, 
+                    if (!noteSummary.trim() || !noteDescription.trim() || !noteOrigin) {
+                      // Basic validation - you could add toast notification here
+                      return;
+                    }
+
+                    // Get origin name based on selected origin
+                    let originName = "";
+                    if (noteType === "Client") {
+                      originName = "Client Profile";
+                    } else if (noteType === "Plan") {
+                      const plan = plansList.find(p => p.id === noteOrigin);
+                      originName = plan ? `${plan.accountNumber || plan.id} - ${plan.type}` : noteOrigin;
+                    } else if (noteType === "Investment Product") {
+                      const fund = fundAccounts.find(f => f.id === noteOrigin);
+                      originName = fund ? (fund.productName || fund.fullName || fund.id) : noteOrigin;
+                    } else if (noteType === "Transaction") {
+                      const transactionNames: Record<string, string> = {
+                        "trans-001": "Deposit - $5,000",
+                        "trans-002": "Withdrawal - $2,000",
+                        "trans-003": "Purchase - $1,500",
+                        "trans-004": "Sale - $3,000",
+                      };
+                      originName = transactionNames[noteOrigin] || noteOrigin;
+                    }
+
+                    // Create new note
+                    const newNote: Note = {
+                      id: `note-${Date.now()}-${id}`,
+                      type: noteType,
+                      summary: noteSummary,
                       description: noteDescription,
-                      origin: noteOrigin 
-                    });
-                    // TODO: Add save logic to add note to allNotes
+                      date: new Date().toISOString(),
+                      originId: noteOrigin,
+                      originName: originName,
+                      createdBy: "Marsh, Antoine",
+                    };
+
+                    // Add note to the list
+                    setAllNotes((prevNotes) => [newNote, ...prevNotes]);
+
+                    // Reset form and close dialog
                     setIsAddClientNoteDialogOpen(false);
                     setNoteType("Client");
                     setNoteSummary("");
@@ -7653,6 +7680,84 @@ const ClientDetails = () => {
                   Cancel
                 </Button>
               </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Note Detail Dialog */}
+        <Dialog open={isNoteDetailDialogOpen} onOpenChange={setIsNoteDetailDialogOpen}>
+          <DialogContent className="bg-gray-50 max-w-2xl">
+            <DialogHeader className="mb-4">
+              <DialogTitle className="text-lg font-semibold text-gray-900">Note Details</DialogTitle>
+            </DialogHeader>
+
+            {selectedNoteForView && (
+              <div className="space-y-6">
+                {/* Note Type and Date */}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded text-blue-700">
+                      {getNoteTypeIcon(selectedNoteForView.type)}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">{selectedNoteForView.type}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        {new Date(selectedNoteForView.date).toLocaleDateString("en-CA", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })} at {new Date(selectedNoteForView.date).toLocaleTimeString("en-CA", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        }).toLowerCase()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Note Summary */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-gray-900">Summary</Label>
+                  <div className="text-sm text-gray-900 bg-white p-3 rounded border border-gray-200">
+                    {selectedNoteForView.summary}
+                  </div>
+                </div>
+
+                {/* Note Description */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-gray-900">Description</Label>
+                  <div className="text-sm text-gray-700 bg-white p-3 rounded border border-gray-200 min-h-[100px] whitespace-pre-wrap">
+                    {selectedNoteForView.description}
+                  </div>
+                </div>
+
+                {/* Origin and Created By */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold text-gray-900">Origin</Label>
+                    <div className="text-sm text-gray-700 bg-white p-3 rounded border border-gray-200">
+                      {selectedNoteForView.originName}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold text-gray-900">Created By</Label>
+                    <div className="text-sm text-gray-700 bg-white p-3 rounded border border-gray-200">
+                      {selectedNoteForView.createdBy || "N/A"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter className="mt-6">
+              <Button
+                variant="outline"
+                className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
+                onClick={() => setIsNoteDetailDialogOpen(false)}
+              >
+                Close
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
