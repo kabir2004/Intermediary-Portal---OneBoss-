@@ -696,16 +696,20 @@ const ClientDetails = () => {
   // Client-specific contact information mapping
   const getClientContactInfo = (clientId: string | undefined) => {
     const contactInfoMap: Record<string, {
-      mailingAddress: { line1: string; line2: string; city: string; province: string; postalCode: string };
+      residentialAddress: { line1: string; line2: string; line3: string };
+      mailingAddress: { line1: string; line2: string; line3: string };
       contact: { home: string; cell: string; email: string };
     }> = {
       "CL001": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "456 Oak Avenue",
           line2: "Unit 12B",
-          city: "Toronto",
-          province: "Ontario",
-          postalCode: "M4B 1K3",
+          line3: "TORONTO ON M4B 1K3",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 1234",
+          line2: "Mail Service Centre",
+          line3: "TORONTO ON M5H 2N2",
         },
         contact: {
           home: "416-555-0123",
@@ -714,12 +718,15 @@ const ClientDetails = () => {
         },
       },
       "CL002": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "789 Maple Drive",
           line2: "Apt 5C",
-          city: "Los Angeles",
-          province: "California",
-          postalCode: "90001",
+          line3: "LOS ANGELES CA 90001",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 5678",
+          line2: "Business Mail Services",
+          line3: "LOS ANGELES CA 90002",
         },
         contact: {
           home: "323-555-0234",
@@ -728,12 +735,15 @@ const ClientDetails = () => {
         },
       },
       "CL005": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "321 Elm Street",
           line2: "Floor 3",
-          city: "Boston",
-          province: "Massachusetts",
-          postalCode: "02101",
+          line3: "BOSTON MA 02101",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 9012",
+          line2: "Mail Processing Center",
+          line3: "BOSTON MA 02102",
         },
         contact: {
           home: "617-555-0345",
@@ -742,12 +752,15 @@ const ClientDetails = () => {
         },
       },
       "CL006": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "654 Pine Boulevard",
           line2: "Suite 100",
-          city: "Toronto",
-          province: "Ontario",
-          postalCode: "M5J 2N8",
+          line3: "TORONTO ON M5J 2N8",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 3456",
+          line2: "Corporate Mail Services",
+          line3: "TORONTO ON M5K 1A1",
         },
         contact: {
           home: "416-555-0456",
@@ -756,12 +769,15 @@ const ClientDetails = () => {
         },
       },
       "CL007": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "987 Cedar Lane",
           line2: "Unit 8A",
-          city: "Vancouver",
-          province: "British Columbia",
-          postalCode: "V6B 1A1",
+          line3: "VANCOUVER BC V6B 1A1",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 7890",
+          line2: "Pacific Mail Centre",
+          line3: "VANCOUVER BC V6C 1B2",
         },
         contact: {
           home: "604-555-0567",
@@ -770,12 +786,15 @@ const ClientDetails = () => {
         },
       },
       "CL008": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "147 Birch Road",
           line2: "Apt 22",
-          city: "Montreal",
-          province: "Quebec",
-          postalCode: "H3A 0G4",
+          line3: "MONTREAL QC H3A 0G4",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 2345",
+          line2: "Quebec Mail Services",
+          line3: "MONTREAL QC H3B 1H5",
         },
         contact: {
           home: "514-555-0678",
@@ -784,12 +803,15 @@ const ClientDetails = () => {
         },
       },
       "CL009": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "258 Spruce Court",
           line2: "Suite 450",
-          city: "Seattle",
-          province: "Washington",
-          postalCode: "98101",
+          line3: "SEATTLE WA 98101",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 6789",
+          line2: "Northwest Mail Hub",
+          line3: "SEATTLE WA 98102",
         },
         contact: {
           home: "206-555-0789",
@@ -798,12 +820,15 @@ const ClientDetails = () => {
         },
       },
       "CL011": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "369 Willow Way",
           line2: "Floor 2",
-          city: "Denver",
-          province: "Colorado",
-          postalCode: "80202",
+          line3: "DENVER CO 80202",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 1122",
+          line2: "Mountain Mail Services",
+          line3: "DENVER CO 80203",
         },
         contact: {
           home: "303-555-0890",
@@ -812,12 +837,15 @@ const ClientDetails = () => {
         },
       },
       "CL012": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "741 Ash Street",
           line2: "Unit 15",
-          city: "Atlanta",
-          province: "Georgia",
-          postalCode: "30301",
+          line3: "ATLANTA GA 30301",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 4455",
+          line2: "Southern Mail Center",
+          line3: "ATLANTA GA 30302",
         },
         contact: {
           home: "404-555-0901",
@@ -826,12 +854,15 @@ const ClientDetails = () => {
         },
       },
       "CL013": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "852 Poplar Avenue",
           line2: "Apt 9B",
-          city: "Miami",
-          province: "Florida",
-          postalCode: "33101",
+          line3: "MIAMI FL 33101",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 7788",
+          line2: "Tropical Mail Services",
+          line3: "MIAMI FL 33102",
         },
         contact: {
           home: "305-555-1012",
@@ -840,12 +871,15 @@ const ClientDetails = () => {
         },
       },
       "CL014": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "963 Fir Boulevard",
           line2: "Suite 200",
-          city: "San Francisco",
-          province: "California",
-          postalCode: "94102",
+          line3: "SAN FRANCISCO CA 94102",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 3344",
+          line2: "Bay Area Mail Hub",
+          line3: "SAN FRANCISCO CA 94103",
         },
         contact: {
           home: "415-555-1123",
@@ -854,12 +888,15 @@ const ClientDetails = () => {
         },
       },
       "CL015": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "159 Hemlock Drive",
           line2: "Unit 7C",
-          city: "Chicago",
-          province: "Illinois",
-          postalCode: "60601",
+          line3: "CHICAGO IL 60601",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 5566",
+          line2: "Midwest Mail Center",
+          line3: "CHICAGO IL 60602",
         },
         contact: {
           home: "312-555-1234",
@@ -868,12 +905,15 @@ const ClientDetails = () => {
         },
       },
       "CL016": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "357 Cypress Lane",
           line2: "Apt 4D",
-          city: "Phoenix",
-          province: "Arizona",
-          postalCode: "85001",
+          line3: "PHOENIX AZ 85001",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 9900",
+          line2: "Desert Mail Services",
+          line3: "PHOENIX AZ 85002",
         },
         contact: {
           home: "602-555-1345",
@@ -882,12 +922,15 @@ const ClientDetails = () => {
         },
       },
       "CL017": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "468 Juniper Road",
           line2: "Suite 300",
-          city: "Calgary",
-          province: "Alberta",
-          postalCode: "T2P 1J1",
+          line3: "CALGARY AB T2P 1J1",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 2233",
+          line2: "Prairie Mail Services",
+          line3: "CALGARY AB T2P 2K2",
         },
         contact: {
           home: "403-555-1456",
@@ -896,12 +939,15 @@ const ClientDetails = () => {
         },
       },
       "CL018": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "579 Magnolia Street",
           line2: "Floor 5",
-          city: "Houston",
-          province: "Texas",
-          postalCode: "77001",
+          line3: "HOUSTON TX 77001",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 6677",
+          line2: "Gulf Coast Mail Hub",
+          line3: "HOUSTON TX 77002",
         },
         contact: {
           home: "713-555-1567",
@@ -910,12 +956,15 @@ const ClientDetails = () => {
         },
       },
       "CL019": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "680 Dogwood Court",
           line2: "Unit 11A",
-          city: "Portland",
-          province: "Oregon",
-          postalCode: "97201",
+          line3: "PORTLAND OR 97201",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 8899",
+          line2: "Pacific Northwest Mail",
+          line3: "PORTLAND OR 97202",
         },
         contact: {
           home: "503-555-1678",
@@ -924,12 +973,15 @@ const ClientDetails = () => {
         },
       },
       "CL020": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "791 Redwood Avenue",
           line2: "Apt 6B",
-          city: "Ottawa",
-          province: "Ontario",
-          postalCode: "K1A 0A6",
+          line3: "OTTAWA ON K1A 0A6",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 1011",
+          line2: "Capital Mail Services",
+          line3: "OTTAWA ON K1A 1B7",
         },
         contact: {
           home: "613-555-1789",
@@ -938,12 +990,15 @@ const ClientDetails = () => {
         },
       },
       "CL021": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "802 Sequoia Boulevard",
           line2: "Suite 150",
-          city: "San Diego",
-          province: "California",
-          postalCode: "92101",
+          line3: "SAN DIEGO CA 92101",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 1212",
+          line2: "Coastal Mail Services",
+          line3: "SAN DIEGO CA 92102",
         },
         contact: {
           home: "619-555-1890",
@@ -952,12 +1007,15 @@ const ClientDetails = () => {
         },
       },
       "CL022": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "913 Hickory Drive",
           line2: "Unit 3E",
-          city: "Edmonton",
-          province: "Alberta",
-          postalCode: "T5J 2R7",
+          line3: "EDMONTON AB T5J 2R7",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 1313",
+          line2: "Alberta Mail Centre",
+          line3: "EDMONTON AB T5J 3S8",
         },
         contact: {
           home: "780-555-1901",
@@ -966,12 +1024,15 @@ const ClientDetails = () => {
         },
       },
       "CL023": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "124 Walnut Street",
           line2: "Apt 10C",
-          city: "Austin",
-          province: "Texas",
-          postalCode: "78701",
+          line3: "AUSTIN TX 78701",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 1414",
+          line2: "Texas Mail Services",
+          line3: "AUSTIN TX 78702",
         },
         contact: {
           home: "512-555-2012",
@@ -980,12 +1041,15 @@ const ClientDetails = () => {
         },
       },
       "CL024": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "235 Chestnut Lane",
           line2: "Floor 4",
-          city: "Minneapolis",
-          province: "Minnesota",
-          postalCode: "55401",
+          line3: "MINNEAPOLIS MN 55401",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 1515",
+          line2: "North Central Mail Hub",
+          line3: "MINNEAPOLIS MN 55402",
         },
         contact: {
           home: "612-555-2123",
@@ -994,12 +1058,15 @@ const ClientDetails = () => {
         },
       },
       "CL025": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "346 Beech Road",
           line2: "Suite 250",
-          city: "Winnipeg",
-          province: "Manitoba",
-          postalCode: "R3C 0B1",
+          line3: "WINNIPEG MB R3C 0B1",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 1616",
+          line2: "Manitoba Mail Services",
+          line3: "WINNIPEG MB R3C 1C2",
         },
         contact: {
           home: "204-555-2234",
@@ -1008,12 +1075,15 @@ const ClientDetails = () => {
         },
       },
       "CL026": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "457 Sycamore Court",
           line2: "Unit 14D",
-          city: "Detroit",
-          province: "Michigan",
-          postalCode: "48201",
+          line3: "DETROIT MI 48201",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 1717",
+          line2: "Great Lakes Mail Center",
+          line3: "DETROIT MI 48202",
         },
         contact: {
           home: "313-555-2345",
@@ -1022,12 +1092,15 @@ const ClientDetails = () => {
         },
       },
       "CL027": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "568 Alder Avenue",
           line2: "Apt 8F",
-          city: "Halifax",
-          province: "Nova Scotia",
-          postalCode: "B3H 4R2",
+          line3: "HALIFAX NS B3H 4R2",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 1818",
+          line2: "Maritime Mail Services",
+          line3: "HALIFAX NS B3H 5S3",
         },
         contact: {
           home: "902-555-2456",
@@ -1036,12 +1109,15 @@ const ClientDetails = () => {
         },
       },
       "CL028": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "679 Larch Boulevard",
           line2: "Suite 350",
-          city: "Philadelphia",
-          province: "Pennsylvania",
-          postalCode: "19101",
+          line3: "PHILADELPHIA PA 19101",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 1919",
+          line2: "East Coast Mail Hub",
+          line3: "PHILADELPHIA PA 19102",
         },
         contact: {
           home: "215-555-2567",
@@ -1050,12 +1126,15 @@ const ClientDetails = () => {
         },
       },
       "CL029": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "780 Yew Street",
           line2: "Unit 12G",
-          city: "Quebec City",
-          province: "Quebec",
-          postalCode: "G1R 2J7",
+          line3: "QUEBEC CITY QC G1R 2J7",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 2020",
+          line2: "Quebec City Mail Services",
+          line3: "QUEBEC CITY QC G1R 3K8",
         },
         contact: {
           home: "418-555-2678",
@@ -1064,12 +1143,15 @@ const ClientDetails = () => {
         },
       },
       "CL030": {
-        mailingAddress: {
+        residentialAddress: {
           line1: "891 Mahogany Drive",
           line2: "Floor 6",
-          city: "Las Vegas",
-          province: "Nevada",
-          postalCode: "89101",
+          line3: "LAS VEGAS NV 89101",
+        },
+        mailingAddress: {
+          line1: "P.O. Box 2121",
+          line2: "Desert Mail Center",
+          line3: "LAS VEGAS NV 89102",
         },
         contact: {
           home: "702-555-2789",
@@ -1081,12 +1163,15 @@ const ClientDetails = () => {
 
     // Default fallback if client ID not found
     return contactInfoMap[clientId || ""] || {
-      mailingAddress: {
+      residentialAddress: {
         line1: "123 Main Street",
         line2: "Suite 200",
-        city: "Toronto",
-        province: "Ontario",
-        postalCode: "M5H 2N2",
+        line3: "TORONTO ON M5H 2N2",
+      },
+      mailingAddress: {
+        line1: "P.O. Box 9999",
+        line2: "General Mail Services",
+        line3: "TORONTO ON M5H 3N3",
       },
       contact: {
         home: "555-555-5555",
@@ -1103,6 +1188,7 @@ const ClientDetails = () => {
     totalAssets: calculateTotalAssets(),
     totalTrades: 45,
     joinDate: "2024-01-15",
+    residentialAddress: clientContactInfo.residentialAddress,
     mailingAddress: clientContactInfo.mailingAddress,
     contact: clientContactInfo.contact,
     representative: {
@@ -1377,13 +1463,16 @@ const ClientDetails = () => {
                       <p className="font-semibold">Mailing Address:</p>
                       <p>{clientDetails.mailingAddress.line1}</p>
                       {clientDetails.mailingAddress.line2 && <p>{clientDetails.mailingAddress.line2}</p>}
-                      <p>{clientDetails.mailingAddress.city}, {clientDetails.mailingAddress.province} {clientDetails.mailingAddress.postalCode}</p>
+                      {clientDetails.mailingAddress.line3 && <p>{clientDetails.mailingAddress.line3}</p>}
                     </div>
                   </TooltipContent>
                 </Tooltip>
               )}
             </CardHeader>
             <CardContent className="pt-0">
+              <p className="text-sm text-gray-700">{clientDetails.residentialAddress.line1}</p>
+              <p className="text-sm text-gray-700">{clientDetails.residentialAddress.line2}</p>
+              <p className="text-sm text-gray-700">{clientDetails.residentialAddress.line3}</p>
               <p className="text-sm text-gray-700 mt-2">Home: {clientDetails.contact.home}</p>
               <p className="text-sm text-gray-700">Cell: {clientDetails.contact.cell}</p>
             </CardContent>
