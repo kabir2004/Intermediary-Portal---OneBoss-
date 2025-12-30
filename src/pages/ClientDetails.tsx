@@ -696,14 +696,16 @@ const ClientDetails = () => {
   // Client-specific contact information mapping
   const getClientContactInfo = (clientId: string | undefined) => {
     const contactInfoMap: Record<string, {
-      mailingAddress: { line1: string; line2: string; line3: string };
+      mailingAddress: { line1: string; line2: string; city: string; province: string; postalCode: string };
       contact: { home: string; cell: string; email: string };
     }> = {
       "CL001": {
         mailingAddress: {
           line1: "456 Oak Avenue",
           line2: "Unit 12B",
-          line3: "TORONTO ON M4B 1K3",
+          city: "Toronto",
+          province: "Ontario",
+          postalCode: "M4B 1K3",
         },
         contact: {
           home: "416-555-0123",
@@ -715,7 +717,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "789 Maple Drive",
           line2: "Apt 5C",
-          line3: "LOS ANGELES CA 90001",
+          city: "Los Angeles",
+          province: "California",
+          postalCode: "90001",
         },
         contact: {
           home: "323-555-0234",
@@ -727,7 +731,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "321 Elm Street",
           line2: "Floor 3",
-          line3: "BOSTON MA 02101",
+          city: "Boston",
+          province: "Massachusetts",
+          postalCode: "02101",
         },
         contact: {
           home: "617-555-0345",
@@ -739,7 +745,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "654 Pine Boulevard",
           line2: "Suite 100",
-          line3: "TORONTO ON M5J 2N8",
+          city: "Toronto",
+          province: "Ontario",
+          postalCode: "M5J 2N8",
         },
         contact: {
           home: "416-555-0456",
@@ -751,7 +759,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "987 Cedar Lane",
           line2: "Unit 8A",
-          line3: "VANCOUVER BC V6B 1A1",
+          city: "Vancouver",
+          province: "British Columbia",
+          postalCode: "V6B 1A1",
         },
         contact: {
           home: "604-555-0567",
@@ -763,7 +773,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "147 Birch Road",
           line2: "Apt 22",
-          line3: "MONTREAL QC H3A 0G4",
+          city: "Montreal",
+          province: "Quebec",
+          postalCode: "H3A 0G4",
         },
         contact: {
           home: "514-555-0678",
@@ -775,7 +787,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "258 Spruce Court",
           line2: "Suite 450",
-          line3: "SEATTLE WA 98101",
+          city: "Seattle",
+          province: "Washington",
+          postalCode: "98101",
         },
         contact: {
           home: "206-555-0789",
@@ -787,7 +801,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "369 Willow Way",
           line2: "Floor 2",
-          line3: "DENVER CO 80202",
+          city: "Denver",
+          province: "Colorado",
+          postalCode: "80202",
         },
         contact: {
           home: "303-555-0890",
@@ -799,7 +815,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "741 Ash Street",
           line2: "Unit 15",
-          line3: "ATLANTA GA 30301",
+          city: "Atlanta",
+          province: "Georgia",
+          postalCode: "30301",
         },
         contact: {
           home: "404-555-0901",
@@ -811,7 +829,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "852 Poplar Avenue",
           line2: "Apt 9B",
-          line3: "MIAMI FL 33101",
+          city: "Miami",
+          province: "Florida",
+          postalCode: "33101",
         },
         contact: {
           home: "305-555-1012",
@@ -823,7 +843,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "963 Fir Boulevard",
           line2: "Suite 200",
-          line3: "SAN FRANCISCO CA 94102",
+          city: "San Francisco",
+          province: "California",
+          postalCode: "94102",
         },
         contact: {
           home: "415-555-1123",
@@ -835,7 +857,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "159 Hemlock Drive",
           line2: "Unit 7C",
-          line3: "CHICAGO IL 60601",
+          city: "Chicago",
+          province: "Illinois",
+          postalCode: "60601",
         },
         contact: {
           home: "312-555-1234",
@@ -847,7 +871,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "357 Cypress Lane",
           line2: "Apt 4D",
-          line3: "PHOENIX AZ 85001",
+          city: "Phoenix",
+          province: "Arizona",
+          postalCode: "85001",
         },
         contact: {
           home: "602-555-1345",
@@ -859,7 +885,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "468 Juniper Road",
           line2: "Suite 300",
-          line3: "CALGARY AB T2P 1J1",
+          city: "Calgary",
+          province: "Alberta",
+          postalCode: "T2P 1J1",
         },
         contact: {
           home: "403-555-1456",
@@ -871,7 +899,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "579 Magnolia Street",
           line2: "Floor 5",
-          line3: "HOUSTON TX 77001",
+          city: "Houston",
+          province: "Texas",
+          postalCode: "77001",
         },
         contact: {
           home: "713-555-1567",
@@ -883,7 +913,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "680 Dogwood Court",
           line2: "Unit 11A",
-          line3: "PORTLAND OR 97201",
+          city: "Portland",
+          province: "Oregon",
+          postalCode: "97201",
         },
         contact: {
           home: "503-555-1678",
@@ -895,7 +927,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "791 Redwood Avenue",
           line2: "Apt 6B",
-          line3: "OTTAWA ON K1A 0A6",
+          city: "Ottawa",
+          province: "Ontario",
+          postalCode: "K1A 0A6",
         },
         contact: {
           home: "613-555-1789",
@@ -907,7 +941,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "802 Sequoia Boulevard",
           line2: "Suite 150",
-          line3: "SAN DIEGO CA 92101",
+          city: "San Diego",
+          province: "California",
+          postalCode: "92101",
         },
         contact: {
           home: "619-555-1890",
@@ -919,7 +955,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "913 Hickory Drive",
           line2: "Unit 3E",
-          line3: "EDMONTON AB T5J 2R7",
+          city: "Edmonton",
+          province: "Alberta",
+          postalCode: "T5J 2R7",
         },
         contact: {
           home: "780-555-1901",
@@ -931,7 +969,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "124 Walnut Street",
           line2: "Apt 10C",
-          line3: "AUSTIN TX 78701",
+          city: "Austin",
+          province: "Texas",
+          postalCode: "78701",
         },
         contact: {
           home: "512-555-2012",
@@ -943,7 +983,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "235 Chestnut Lane",
           line2: "Floor 4",
-          line3: "MINNEAPOLIS MN 55401",
+          city: "Minneapolis",
+          province: "Minnesota",
+          postalCode: "55401",
         },
         contact: {
           home: "612-555-2123",
@@ -955,7 +997,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "346 Beech Road",
           line2: "Suite 250",
-          line3: "WINNIPEG MB R3C 0B1",
+          city: "Winnipeg",
+          province: "Manitoba",
+          postalCode: "R3C 0B1",
         },
         contact: {
           home: "204-555-2234",
@@ -967,7 +1011,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "457 Sycamore Court",
           line2: "Unit 14D",
-          line3: "DETROIT MI 48201",
+          city: "Detroit",
+          province: "Michigan",
+          postalCode: "48201",
         },
         contact: {
           home: "313-555-2345",
@@ -979,7 +1025,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "568 Alder Avenue",
           line2: "Apt 8F",
-          line3: "HALIFAX NS B3H 4R2",
+          city: "Halifax",
+          province: "Nova Scotia",
+          postalCode: "B3H 4R2",
         },
         contact: {
           home: "902-555-2456",
@@ -991,7 +1039,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "679 Larch Boulevard",
           line2: "Suite 350",
-          line3: "PHILADELPHIA PA 19101",
+          city: "Philadelphia",
+          province: "Pennsylvania",
+          postalCode: "19101",
         },
         contact: {
           home: "215-555-2567",
@@ -1003,7 +1053,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "780 Yew Street",
           line2: "Unit 12G",
-          line3: "QUEBEC CITY QC G1R 2J7",
+          city: "Quebec City",
+          province: "Quebec",
+          postalCode: "G1R 2J7",
         },
         contact: {
           home: "418-555-2678",
@@ -1015,7 +1067,9 @@ const ClientDetails = () => {
         mailingAddress: {
           line1: "891 Mahogany Drive",
           line2: "Floor 6",
-          line3: "LAS VEGAS NV 89101",
+          city: "Las Vegas",
+          province: "Nevada",
+          postalCode: "89101",
         },
         contact: {
           home: "702-555-2789",
@@ -1030,7 +1084,9 @@ const ClientDetails = () => {
       mailingAddress: {
         line1: "123 Main Street",
         line2: "Suite 200",
-        line3: "TORONTO ON M5H 2N2",
+        city: "Toronto",
+        province: "Ontario",
+        postalCode: "M5H 2N2",
       },
       contact: {
         home: "555-555-5555",
@@ -1321,7 +1377,7 @@ const ClientDetails = () => {
                       <p className="font-semibold">Mailing Address:</p>
                       <p>{clientDetails.mailingAddress.line1}</p>
                       {clientDetails.mailingAddress.line2 && <p>{clientDetails.mailingAddress.line2}</p>}
-                      {clientDetails.mailingAddress.line3 && <p>{clientDetails.mailingAddress.line3}</p>}
+                      <p>{clientDetails.mailingAddress.city}, {clientDetails.mailingAddress.province} {clientDetails.mailingAddress.postalCode}</p>
                     </div>
                   </TooltipContent>
                 </Tooltip>
@@ -1329,7 +1385,11 @@ const ClientDetails = () => {
             </CardHeader>
             <CardContent className="pt-0">
               <p className="text-sm text-gray-700">{clientDetails.mailingAddress.line1}</p>
-              <p className="text-sm text-gray-700">{clientDetails.mailingAddress.line2}</p>
+              {clientDetails.mailingAddress.line2 && (
+                <p className="text-sm text-gray-700">{clientDetails.mailingAddress.line2}</p>
+              )}
+              <p className="text-sm text-gray-700">{clientDetails.mailingAddress.city}, {clientDetails.mailingAddress.province}</p>
+              <p className="text-sm text-gray-700">{clientDetails.mailingAddress.postalCode}</p>
               <p className="text-sm text-gray-700 mt-2">Home: {clientDetails.contact.home}</p>
               <p className="text-sm text-gray-700">Cell: {clientDetails.contact.cell}</p>
             </CardContent>
