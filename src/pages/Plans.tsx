@@ -26,9 +26,11 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { Loader2, Plus, Eye, Pencil, Search, ChevronDown, ChevronUp, Minus, ArrowLeftRight, X, CheckCircle2, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, UploadCloud } from "lucide-react";
+import { Loader2, Plus, Eye, Pencil, Search, ChevronDown, ChevronUp, Minus, ArrowLeftRight, X, CheckCircle2, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, UploadCloud, Calendar as CalendarIcon } from "lucide-react";
 import { fundsData } from "@/data/fundsData";
 
 type Fund = {
@@ -116,6 +118,7 @@ type Plan = {
   id: string;
   type: PlanType;
   accountNumber: string;
+  accountHolder?: string;
   clientId: string;
   clientName: string;
   status: PlanStatus;
@@ -127,6 +130,11 @@ type Plan = {
   openedDate: string;
   contributionRoom?: number;
   contributionUsed?: number;
+  // Important Dates
+  startDate: string;
+  kycOnFileDate: string;
+  kycAge: string;
+  kycOriginalReceivedDate: string;
 };
 
 const PLANS: Plan[] = [
@@ -134,6 +142,7 @@ const PLANS: Plan[] = [
     id: "P-001",
     type: "RRSP",
     accountNumber: "RRSP-984512",
+    accountHolder: "Smith Family Trust",
     clientId: "CL-001",
     clientName: "Smith Family Trust",
     status: "Active",
@@ -144,6 +153,10 @@ const PLANS: Plan[] = [
     openedDate: "2020-03-15",
     contributionRoom: 50000,
     contributionUsed: 250000,
+    startDate: "2020-03-15",
+    kycOnFileDate: "2020-02-10",
+    kycAge: "1420 days Old",
+    kycOriginalReceivedDate: "2020-01-28",
     holdings: [
       {
         symbol: "VFV.TO",
@@ -247,6 +260,7 @@ const PLANS: Plan[] = [
     id: "P-002",
     type: "TFSA",
     accountNumber: "TFSA-984512",
+    accountHolder: "Smith Family Trust",
     clientId: "CL-001",
     clientName: "Smith Family Trust",
     status: "Active",
@@ -257,6 +271,10 @@ const PLANS: Plan[] = [
     openedDate: "2019-06-10",
     contributionRoom: 95000,
     contributionUsed: 100000,
+    startDate: "2019-06-10",
+    kycOnFileDate: "2019-05-05",
+    kycAge: "1680 days Old",
+    kycOriginalReceivedDate: "2019-04-22",
     holdings: [
       {
         symbol: "VFV.TO",
@@ -300,6 +318,7 @@ const PLANS: Plan[] = [
     id: "P-003",
     type: "Non-Registered",
     accountNumber: "NR-984512",
+    accountHolder: "Smith Family Trust",
     clientId: "CL-001",
     clientName: "Smith Family Trust",
     status: "Active",
@@ -308,6 +327,10 @@ const PLANS: Plan[] = [
     totalGainLoss: 5000.00,
     totalGainLossPercent: 7.14,
     openedDate: "2021-01-20",
+    startDate: "2021-01-20",
+    kycOnFileDate: "2020-12-15",
+    kycAge: "1115 days Old",
+    kycOriginalReceivedDate: "2020-11-30",
     holdings: [
       {
         symbol: "XAW.TO",
@@ -351,6 +374,7 @@ const PLANS: Plan[] = [
     id: "P-004",
     type: "RESP",
     accountNumber: "RESP-782341",
+    accountHolder: "Johnson Retirement Fund",
     clientId: "CL-002",
     clientName: "Johnson Retirement Fund",
     status: "Active",
@@ -361,6 +385,10 @@ const PLANS: Plan[] = [
     openedDate: "2018-09-05",
     contributionRoom: 50000,
     contributionUsed: 150000,
+    startDate: "2018-09-05",
+    kycOnFileDate: "2018-08-20",
+    kycAge: "1980 days Old",
+    kycOriginalReceivedDate: "2018-08-05",
     holdings: [
       {
         symbol: "VFV.TO",
@@ -404,6 +432,7 @@ const PLANS: Plan[] = [
     id: "P-005",
     type: "RRIF",
     accountNumber: "RRIF-456789",
+    accountHolder: "Martinez Investment Group",
     clientId: "CL-003",
     clientName: "Martinez Investment Group",
     status: "Active",
@@ -412,6 +441,10 @@ const PLANS: Plan[] = [
     totalGainLoss: 40000.00,
     totalGainLossPercent: 14.29,
     openedDate: "2022-04-12",
+    startDate: "2022-04-12",
+    kycOnFileDate: "2022-03-28",
+    kycAge: "625 days Old",
+    kycOriginalReceivedDate: "2022-03-15",
     holdings: [
       {
         symbol: "XAW.TO",
@@ -468,6 +501,7 @@ const PLANS: Plan[] = [
     id: "P-006",
     type: "RRSP",
     accountNumber: "RRSP-123456",
+    accountHolder: "Williams Education Savings",
     clientId: "CL-004",
     clientName: "Williams Education Savings",
     status: "Active",
@@ -478,6 +512,10 @@ const PLANS: Plan[] = [
     openedDate: "2021-05-20",
     contributionRoom: 45000,
     contributionUsed: 180000,
+    startDate: "2021-05-20",
+    kycOnFileDate: "2021-04-25",
+    kycAge: "960 days Old",
+    kycOriginalReceivedDate: "2021-04-10",
     holdings: [
       {
         symbol: "VFV.TO",
@@ -533,6 +571,7 @@ const PLANS: Plan[] = [
     id: "P-007",
     type: "RRSP",
     accountNumber: "RRSP-234567",
+    accountHolder: "Brown Family Trust",
     clientId: "CL-005",
     clientName: "Brown Family Trust",
     status: "Active",
@@ -543,6 +582,10 @@ const PLANS: Plan[] = [
     openedDate: "2020-08-15",
     contributionRoom: 50000,
     contributionUsed: 150000,
+    startDate: "2020-08-15",
+    kycOnFileDate: "2020-07-20",
+    kycAge: "1235 days Old",
+    kycOriginalReceivedDate: "2020-07-05",
     holdings: [
       {
         symbol: "XIC.TO",
@@ -598,6 +641,7 @@ const PLANS: Plan[] = [
     id: "P-008",
     type: "RRSP",
     accountNumber: "RRSP-345678",
+    accountHolder: "Davis Tax-Free Account",
     clientId: "CL-006",
     clientName: "Davis Tax-Free Account",
     status: "Active",
@@ -608,6 +652,10 @@ const PLANS: Plan[] = [
     openedDate: "2019-11-30",
     contributionRoom: 50000,
     contributionUsed: 200000,
+    startDate: "2019-11-30",
+    kycOnFileDate: "2019-11-05",
+    kycAge: "1525 days Old",
+    kycOriginalReceivedDate: "2019-10-20",
     holdings: [
       {
         symbol: "XAW.TO",
@@ -651,6 +699,7 @@ const PLANS: Plan[] = [
     id: "P-009",
     type: "RRSP",
     accountNumber: "RRSP-456789",
+    accountHolder: "Hamilton Family Trust",
     clientId: "CL-007",
     clientName: "Hamilton Family Trust",
     status: "Active",
@@ -661,6 +710,10 @@ const PLANS: Plan[] = [
     openedDate: "2022-01-10",
     contributionRoom: 50000,
     contributionUsed: 135000,
+    startDate: "2022-01-10",
+    kycOnFileDate: "2021-12-25",
+    kycAge: "715 days Old",
+    kycOriginalReceivedDate: "2021-12-10",
     holdings: [
       {
         symbol: "XIC.TO",
@@ -716,6 +769,7 @@ const PLANS: Plan[] = [
     id: "P-010",
     type: "RRSP",
     accountNumber: "RRSP-567890",
+    accountHolder: "Sunrise Portfolio",
     clientId: "CL-008",
     clientName: "Sunrise Portfolio",
     status: "Active",
@@ -726,6 +780,10 @@ const PLANS: Plan[] = [
     openedDate: "2020-02-28",
     contributionRoom: 50000,
     contributionUsed: 250000,
+    startDate: "2020-02-28",
+    kycOnFileDate: "2020-02-10",
+    kycAge: "1400 days Old",
+    kycOriginalReceivedDate: "2020-01-25",
     holdings: [
       {
         symbol: "VFV.TO",
@@ -781,6 +839,7 @@ const PLANS: Plan[] = [
     id: "P-011",
     type: "RRSP",
     accountNumber: "RRSP-678901",
+    accountHolder: "Evergreen Wealth",
     clientId: "CL-009",
     clientName: "Evergreen Wealth",
     status: "Active",
@@ -791,6 +850,10 @@ const PLANS: Plan[] = [
     openedDate: "2021-07-22",
     contributionRoom: 50000,
     contributionUsed: 165000,
+    startDate: "2021-07-22",
+    kycOnFileDate: "2021-07-05",
+    kycAge: "900 days Old",
+    kycOriginalReceivedDate: "2021-06-20",
     holdings: [
       {
         symbol: "XIC.TO",
@@ -846,6 +909,7 @@ const PLANS: Plan[] = [
     id: "P-012",
     type: "RRSP",
     accountNumber: "RRSP-789012",
+    accountHolder: "Maple Leaf Holdings",
     clientId: "CL-010",
     clientName: "Maple Leaf Holdings",
     status: "Active",
@@ -856,6 +920,10 @@ const PLANS: Plan[] = [
     openedDate: "2020-12-05",
     contributionRoom: 50000,
     contributionUsed: 195000,
+    startDate: "2020-12-05",
+    kycOnFileDate: "2020-11-20",
+    kycAge: "1120 days Old",
+    kycOriginalReceivedDate: "2020-11-05",
     holdings: [
       {
         symbol: "XAW.TO",
@@ -899,6 +967,7 @@ const PLANS: Plan[] = [
     id: "P-013",
     type: "RRSP",
     accountNumber: "RRSP-890123",
+    accountHolder: "Aurora RESP",
     clientId: "CL-011",
     clientName: "Aurora RESP",
     status: "Active",
@@ -909,6 +978,10 @@ const PLANS: Plan[] = [
     openedDate: "2021-09-18",
     contributionRoom: 50000,
     contributionUsed: 145000,
+    startDate: "2021-09-18",
+    kycOnFileDate: "2021-09-01",
+    kycAge: "835 days Old",
+    kycOriginalReceivedDate: "2021-08-15",
     holdings: [
       {
         symbol: "XIC.TO",
@@ -972,9 +1045,13 @@ const PLANS: Plan[] = [
     totalGainLoss: 15000.00,
     totalGainLossPercent: 8.57,
     openedDate: "2020-06-14",
+        accountHolder: "Harper Estate",
+    startDate: "2020-06-14",
+    kycOnFileDate: "2020-05-26",
+    kycAge: "2045 days Old",
+    kycOriginalReceivedDate: "2020-05-16",
     contributionRoom: 50000,
-    contributionUsed: 175000,
-    holdings: [
+    contributionUsed: 175000,holdings: [
       {
         symbol: "VFV.TO",
         name: "Vanguard S&P 500 Index ETF",
@@ -1025,9 +1102,13 @@ const PLANS: Plan[] = [
     totalGainLoss: 15000.00,
     totalGainLossPercent: 9.38,
     openedDate: "2021-03-25",
+        accountHolder: "Taylor Investment",
+    startDate: "2021-03-25",
+    kycOnFileDate: "2021-03-05",
+    kycAge: "1762 days Old",
+    kycOriginalReceivedDate: "2021-02-22",
     contributionRoom: 50000,
-    contributionUsed: 160000,
-    holdings: [
+    contributionUsed: 160000,holdings: [
       {
         symbol: "XIC.TO",
         name: "iShares Core S&P/TSX Capped Composite Index ETF",
@@ -1090,9 +1171,13 @@ const PLANS: Plan[] = [
     totalGainLoss: 15000.00,
     totalGainLossPercent: 8.11,
     openedDate: "2020-10-08",
+        accountHolder: "Roberts Family",
+    startDate: "2020-10-08",
+    kycOnFileDate: "2020-09-17",
+    kycAge: "1931 days Old",
+    kycOriginalReceivedDate: "2020-09-05",
     contributionRoom: 50000,
-    contributionUsed: 185000,
-    holdings: [
+    contributionUsed: 185000,holdings: [
       {
         symbol: "XAW.TO",
         name: "iShares Core MSCI All Country World ex Canada Index ETF",
@@ -1124,8 +1209,7 @@ const PLANS: Plan[] = [
         price: 27.15,
         marketValue: 57015.00,
         costBasis: 55000.00,
-        gainLoss: 2015.00,
-        gainLossPercent: 3.66,
+        gainLoss: 2015.00,gainLossPercent: 3.66,
         assetClass: "Fixed Income",
         sector: "Bonds",
       },
@@ -1144,6 +1228,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 10000.00,
     totalGainLossPercent: 11.76,
     openedDate: "2021-02-14",
+        accountHolder: "Williams Education Savings",
+    startDate: "2021-02-14",
+    kycOnFileDate: "2021-01-23",
+    kycAge: "1803 days Old",
+    kycOriginalReceivedDate: "2021-01-10",
     contributionRoom: 95000,
     contributionUsed: 85000,
     holdings: [
@@ -1209,6 +1298,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 15000.00,
     totalGainLossPercent: 15.79,
     openedDate: "2020-07-22",
+        accountHolder: "Brown Family Trust",
+    startDate: "2020-07-22",
+    kycOnFileDate: "2020-06-29",
+    kycAge: "2011 days Old",
+    kycOriginalReceivedDate: "2020-06-15",
     contributionRoom: 95000,
     contributionUsed: 95000,
     holdings: [
@@ -1228,8 +1322,7 @@ const PLANS: Plan[] = [
         symbol: "VFV.TO",
         name: "Vanguard S&P 500 Index ETF",
         shares: 500,
-        price: 98.50,
-        marketValue: 49250.00,
+        price: 98.50,marketValue: 49250.00,
         costBasis: 45000.00,
         gainLoss: 4250.00,
         gainLossPercent: 9.44,
@@ -1262,6 +1355,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 15000.00,
     totalGainLossPercent: 16.67,
     openedDate: "2021-01-05",
+        accountHolder: "Davis Tax-Free Account",
+    startDate: "2021-01-05",
+    kycOnFileDate: "2020-12-12",
+    kycAge: "1845 days Old",
+    kycOriginalReceivedDate: "2020-11-27",
     contributionRoom: 95000,
     contributionUsed: 90000,
     holdings: [
@@ -1273,8 +1371,7 @@ const PLANS: Plan[] = [
         marketValue: 38580.00,
         costBasis: 35000.00,
         gainLoss: 3580.00,
-        gainLossPercent: 10.23,
-        assetClass: "Equity",
+        gainLossPercent: 10.23,assetClass: "Equity",
         sector: "Canadian Equity",
       },
       {
@@ -1315,14 +1412,18 @@ const PLANS: Plan[] = [
     totalGainLoss: 10000.00,
     totalGainLossPercent: 11.36,
     openedDate: "2022-03-12",
+        accountHolder: "Hamilton Family Trust",
+    startDate: "2022-03-12",
+    kycOnFileDate: "2022-02-25",
+    kycAge: "1405 days Old",
+    kycOriginalReceivedDate: "2022-02-09",
     contributionRoom: 95000,
     contributionUsed: 88000,
     holdings: [
       {
         symbol: "VCN.TO",
         name: "Vanguard FTSE Canada All Cap Index ETF",
-        shares: 800,
-        price: 42.75,
+        shares: 800,price: 42.75,
         marketValue: 34200.00,
         costBasis: 30000.00,
         gainLoss: 4200.00,
@@ -1366,8 +1467,12 @@ const PLANS: Plan[] = [
     marketValue: 115000.00,
     costBasis: 100000.00,
     totalGainLoss: 15000.00,
-    totalGainLossPercent: 15.00,
-    openedDate: "2020-05-18",
+    totalGainLossPercent: 15.00,openedDate: "2020-05-18",
+        accountHolder: "Sunrise Portfolio",
+    startDate: "2020-05-18",
+    kycOnFileDate: "2020-05-02",
+    kycAge: "2069 days Old",
+    kycOriginalReceivedDate: "2020-04-22",
     contributionRoom: 95000,
     contributionUsed: 100000,
     holdings: [
@@ -1415,12 +1520,16 @@ const PLANS: Plan[] = [
     accountNumber: "TFSA-678901",
     clientId: "CL-009",
     clientName: "Evergreen Wealth",
-    status: "Active",
-    marketValue: 102000.00,
+    status: "Active",marketValue: 102000.00,
     costBasis: 92000.00,
     totalGainLoss: 10000.00,
     totalGainLossPercent: 10.87,
     openedDate: "2021-08-30",
+        accountHolder: "Evergreen Wealth",
+    startDate: "2021-08-30",
+    kycOnFileDate: "2021-08-13",
+    kycAge: "1601 days Old",
+    kycOriginalReceivedDate: "2021-08-02",
     contributionRoom: 95000,
     contributionUsed: 92000,
     holdings: [
@@ -1471,9 +1580,13 @@ const PLANS: Plan[] = [
     status: "Active",
     marketValue: 108000.00,
     costBasis: 98000.00,
-    totalGainLoss: 10000.00,
-    totalGainLossPercent: 10.20,
+    totalGainLoss: 10000.00,totalGainLossPercent: 10.20,
     openedDate: "2020-11-20",
+        accountHolder: "Maple Leaf Holdings",
+    startDate: "2020-11-20",
+    kycOnFileDate: "2020-11-02",
+    kycAge: "1885 days Old",
+    kycOriginalReceivedDate: "2020-10-21",
     contributionRoom: 95000,
     contributionUsed: 98000,
     holdings: [
@@ -1517,8 +1630,7 @@ const PLANS: Plan[] = [
         symbol: "VCN.TO",
         name: "Vanguard FTSE Canada All Cap Index ETF",
         shares: 200,
-        price: 42.75,
-        marketValue: 8550.00,
+        price: 42.75,marketValue: 8550.00,
         costBasis: 10000.00,
         gainLoss: -1450.00,
         gainLossPercent: -14.50,
@@ -1539,6 +1651,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 10000.00,
     totalGainLossPercent: 11.24,
     openedDate: "2022-01-15",
+        accountHolder: "Aurora RESP",
+    startDate: "2022-01-15",
+    kycOnFileDate: "2021-12-27",
+    kycAge: "1465 days Old",
+    kycOriginalReceivedDate: "2021-12-14",
     contributionRoom: 95000,
     contributionUsed: 89000,
     holdings: [
@@ -1561,8 +1678,7 @@ const PLANS: Plan[] = [
         price: 98.50,
         marketValue: 39400.00,
         costBasis: 35000.00,
-        gainLoss: 4400.00,
-        gainLossPercent: 12.57,
+        gainLoss: 4400.00,gainLossPercent: 12.57,
         assetClass: "Equity",
         sector: "Diversified",
       },
@@ -1593,6 +1709,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 25000.00,
     totalGainLossPercent: 9.62,
     openedDate: "2021-06-10",
+        accountHolder: "Williams Education Savings",
+    startDate: "2021-06-10",
+    kycOnFileDate: "2021-05-21",
+    kycAge: "1685 days Old",
+    kycOriginalReceivedDate: "2021-05-07",
     holdings: [
       {
         symbol: "XAW.TO",
@@ -1615,8 +1736,7 @@ const PLANS: Plan[] = [
         costBasis: 100000.00,
         gainLoss: 8600.00,
         gainLossPercent: 8.60,
-        assetClass: "Fixed Income",
-        sector: "Bonds",
+        assetClass: "Fixed Income",sector: "Bonds",
       },
       {
         symbol: "VFV.TO",
@@ -1644,6 +1764,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 25000.00,
     totalGainLossPercent: 9.26,
     openedDate: "2020-09-25",
+        accountHolder: "Brown Family Trust",
+    startDate: "2020-09-25",
+    kycOnFileDate: "2020-09-04",
+    kycAge: "1944 days Old",
+    kycOriginalReceivedDate: "2020-08-20",
     holdings: [
       {
         symbol: "VFV.TO",
@@ -1661,8 +1786,7 @@ const PLANS: Plan[] = [
         symbol: "XIC.TO",
         name: "iShares Core S&P/TSX Capped Composite Index ETF",
         shares: 2000,
-        price: 32.15,
-        marketValue: 64300.00,
+        price: 32.15,marketValue: 64300.00,
         costBasis: 60000.00,
         gainLoss: 4300.00,
         gainLossPercent: 7.17,
@@ -1707,6 +1831,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 25000.00,
     totalGainLossPercent: 8.77,
     openedDate: "2022-02-18",
+        accountHolder: "Davis Tax-Free Account",
+    startDate: "2022-02-18",
+    kycOnFileDate: "2022-01-27",
+    kycAge: "1434 days Old",
+    kycOriginalReceivedDate: "2022-01-11",
     holdings: [
       {
         symbol: "XAW.TO",
@@ -1721,8 +1850,7 @@ const PLANS: Plan[] = [
         sector: "International Equity",
       },
       {
-        symbol: "VFV.TO",
-        name: "Vanguard S&P 500 Index ETF",
+        symbol: "VFV.TO",name: "Vanguard S&P 500 Index ETF",
         shares: 700,
         price: 98.50,
         marketValue: 68950.00,
@@ -1758,6 +1886,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 20000.00,
     totalGainLossPercent: 7.84,
     openedDate: "2021-04-05",
+        accountHolder: "Hamilton Family Trust",
+    startDate: "2021-04-05",
+    kycOnFileDate: "2021-03-13",
+    kycAge: "1754 days Old",
+    kycOriginalReceivedDate: "2021-03-03",
     holdings: [
       {
         symbol: "VFV.TO",
@@ -1767,8 +1900,7 @@ const PLANS: Plan[] = [
         marketValue: 73875.00,
         costBasis: 65000.00,
         gainLoss: 8875.00,
-        gainLossPercent: 13.65,
-        assetClass: "Equity",
+        gainLossPercent: 13.65,assetClass: "Equity",
         sector: "Diversified",
       },
       {
@@ -1814,14 +1946,18 @@ const PLANS: Plan[] = [
     id: "P-029",
     type: "RESP",
     accountNumber: "RESP-123456",
-    clientId: "CL-004",
-    clientName: "Williams Education Savings",
+    clientId: "CL-004",clientName: "Williams Education Savings",
     status: "Active",
     marketValue: 165000.00,
     costBasis: 140000.00,
     totalGainLoss: 25000.00,
     totalGainLossPercent: 17.86,
     openedDate: "2019-03-20",
+        accountHolder: "Williams Education Savings",
+    startDate: "2019-03-20",
+    kycOnFileDate: "2019-02-24",
+    kycAge: "2502 days Old",
+    kycOriginalReceivedDate: "2019-02-13",
     contributionRoom: 50000,
     contributionUsed: 140000,
     holdings: [
@@ -1857,8 +1993,7 @@ const PLANS: Plan[] = [
         marketValue: 32580.00,
         costBasis: 25000.00,
         gainLoss: 7580.00,
-        gainLossPercent: 30.32,
-        assetClass: "Fixed Income",
+        gainLossPercent: 30.32,assetClass: "Fixed Income",
         sector: "Bonds",
       },
     ],
@@ -1875,6 +2010,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 25000.00,
     totalGainLossPercent: 14.71,
     openedDate: "2018-11-12",
+        accountHolder: "Brown Family Trust",
+    startDate: "2018-11-12",
+    kycOnFileDate: "2018-10-28",
+    kycAge: "2621 days Old",
+    kycOriginalReceivedDate: "2018-10-16",
     contributionRoom: 50000,
     contributionUsed: 170000,
     holdings: [
@@ -1903,8 +2043,7 @@ const PLANS: Plan[] = [
         sector: "Diversified",
       },
       {
-        symbol: "VCN.TO",
-        name: "Vanguard FTSE Canada All Cap Index ETF",
+        symbol: "VCN.TO",name: "Vanguard FTSE Canada All Cap Index ETF",
         shares: 1000,
         price: 42.75,
         marketValue: 42750.00,
@@ -1928,6 +2067,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 20000.00,
     totalGainLossPercent: 12.90,
     openedDate: "2020-01-08",
+        accountHolder: "Davis Tax-Free Account",
+    startDate: "2020-01-08",
+    kycOnFileDate: "2019-12-23",
+    kycAge: "2200 days Old",
+    kycOriginalReceivedDate: "2019-12-10",
     contributionRoom: 50000,
     contributionUsed: 155000,
     holdings: [
@@ -1946,8 +2090,7 @@ const PLANS: Plan[] = [
       {
         symbol: "XIC.TO",
         name: "iShares Core S&P/TSX Capped Composite Index ETF",
-        shares: 1700,
-        price: 32.15,
+        shares: 1700,price: 32.15,
         marketValue: 54655.00,
         costBasis: 50000.00,
         gainLoss: 4655.00,
@@ -1981,7 +2124,11 @@ const PLANS: Plan[] = [
     costBasis: 63000.00,
     totalGainLoss: 5000.00,
     totalGainLossPercent: 7.94,
-    openedDate: "2021-10-15",
+    openedDate: "2021-10-15",    accountHolder: "Williams Education Savings",
+    startDate: "2021-10-15",
+    kycOnFileDate: "2021-09-28",
+    kycAge: "1555 days Old",
+    kycOriginalReceivedDate: "2021-09-14",
     holdings: [
       {
         symbol: "XAW.TO",
@@ -2033,6 +2180,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 5000.00,
     totalGainLossPercent: 7.46,
     openedDate: "2022-05-22",
+        accountHolder: "Brown Family Trust",
+    startDate: "2022-05-22",
+    kycOnFileDate: "2022-05-04",
+    kycAge: "1337 days Old",
+    kycOriginalReceivedDate: "2022-04-19",
     holdings: [
       {
         symbol: "XIC.TO",
@@ -2052,8 +2204,7 @@ const PLANS: Plan[] = [
         shares: 350,
         price: 98.50,
         marketValue: 34475.00,
-        costBasis: 30000.00,
-        gainLoss: 4475.00,
+        costBasis: 30000.00,gainLoss: 4475.00,
         gainLossPercent: 14.92,
         assetClass: "Equity",
         sector: "Diversified",
@@ -2084,6 +2235,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 6000.00,
     totalGainLossPercent: 8.00,
     openedDate: "2020-08-30",
+    accountHolder: "Davis Tax-Free Account",
+    startDate: "2020-08-30",
+    kycOnFileDate: "2020-08-10",
+    kycAge: "1240 days Old",
+    kycOriginalReceivedDate: "2020-07-28",
     holdings: [
       {
         symbol: "VFV.TO",
@@ -2123,6 +2279,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 5000.00,
     totalGainLossPercent: 7.81,
     openedDate: "2021-12-10",
+    accountHolder: "Hamilton Family Trust",
+    startDate: "2021-12-10",
+    kycOnFileDate: "2021-11-25",
+    kycAge: "1502 days Old",
+    kycOriginalReceivedDate: "2021-11-15",
     holdings: [
       {
         symbol: "VCN.TO",
@@ -2174,6 +2335,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 5000.00,
     totalGainLossPercent: 7.35,
     openedDate: "2022-03-08",
+    accountHolder: "Sunrise Portfolio",
+    startDate: "2022-03-08",
+    kycOnFileDate: "2022-02-20",
+    kycAge: "1415 days Old",
+    kycOriginalReceivedDate: "2022-02-10",
     holdings: [
       {
         symbol: "VFV.TO",
@@ -2188,8 +2354,7 @@ const PLANS: Plan[] = [
         sector: "Diversified",
       },
       {
-        symbol: "VCN.TO",
-        name: "Vanguard FTSE Canada All Cap Index ETF",
+        symbol: "VCN.TO",name: "Vanguard FTSE Canada All Cap Index ETF",
         shares: 600,
         price: 42.75,
         marketValue: 25650.00,
@@ -2214,6 +2379,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 15000.00,
     totalGainLossPercent: 8.82,
     openedDate: "2020-07-14",
+    accountHolder: "Evergreen Wealth",
+    startDate: "2020-07-14",
+    kycOnFileDate: "2020-06-28",
+    kycAge: "2031 days Old",
+    kycOriginalReceivedDate: "2020-06-15",
     holdings: [
       {
         symbol: "VFV.TO",
@@ -2265,6 +2435,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 15000.00,
     totalGainLossPercent: 8.33,
     openedDate: "2021-11-25",
+    accountHolder: "Maple Leaf Holdings",
+    startDate: "2021-11-25",
+    kycOnFileDate: "2021-11-10",
+    kycAge: "1520 days Old",
+    kycOriginalReceivedDate: "2021-10-28",
     holdings: [
       {
         symbol: "XIC.TO",
@@ -2317,6 +2492,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 15000.00,
     totalGainLossPercent: 9.38,
     openedDate: "2022-06-18",
+    accountHolder: "Aurora RESP",
+    startDate: "2022-06-18",
+    kycOnFileDate: "2022-06-01",
+    kycAge: "570 days Old",
+    kycOriginalReceivedDate: "2022-05-18",
     holdings: [
       {
         symbol: "VFV.TO",
@@ -2369,6 +2549,11 @@ const PLANS: Plan[] = [
     totalGainLoss: 15000.00,
     totalGainLossPercent: 13.64,
     openedDate: "2021-05-12",
+    accountHolder: "Harper Estate",
+    startDate: "2021-05-12",
+    kycOnFileDate: "2021-04-25",
+    kycAge: "960 days Old",
+    kycOriginalReceivedDate: "2021-04-12",
     holdings: [
       {
         symbol: "VFV.TO",
@@ -2738,6 +2923,11 @@ export default function Plans() {
         openedDate: new Date().toISOString().split("T")[0],
         contributionRoom: formValues.contributionRoom ? parseFloat(formValues.contributionRoom) : undefined,
         contributionUsed: formValues.contributionUsed ? parseFloat(formValues.contributionUsed) : undefined,
+        accountHolder: formValues.ownerName,
+        startDate: new Date().toISOString().split("T")[0],
+        kycOnFileDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        kycAge: "15 days Old",
+        kycOriginalReceivedDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
       };
 
       setPlans([...plans, newPlan]);
@@ -3092,6 +3282,41 @@ export default function Plans() {
                                   <p className="text-sm font-medium text-gray-900">
                                     {formatDate(selectedPlan.openedDate)}
                                   </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Important Dates - Moved up for better visibility */}
+                          <Card className="border-2 border-blue-200 shadow-md bg-white" key={selectedPlan.id}>
+                            <CardHeader className="pb-3 bg-blue-50">
+                              <CardTitle className="text-sm font-bold text-gray-900">Important Dates</CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-4">
+                              <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2 border-b border-gray-100 pb-3">
+                                  <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Start Date</Label>
+                                  <div className="text-base font-semibold text-blue-700">
+                                    {formatDate(selectedPlan.startDate)}
+                                  </div>
+                                </div>
+                                <div className="space-y-2 border-b border-gray-100 pb-3">
+                                  <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">KYC On File Date</Label>
+                                  <div className="text-base font-semibold text-blue-700">
+                                    {formatDate(selectedPlan.kycOnFileDate)}
+                                  </div>
+                                </div>
+                                <div className="space-y-2 border-b border-gray-100 pb-3">
+                                  <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">KYC Age</Label>
+                                  <div className="text-base font-semibold text-orange-600">
+                                    {selectedPlan.kycAge}
+                                  </div>
+                                </div>
+                                <div className="space-y-2 border-b border-gray-100 pb-3">
+                                  <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">KYC Original Received Date</Label>
+                                  <div className="text-base font-semibold text-blue-700">
+                                    {formatDate(selectedPlan.kycOriginalReceivedDate)}
+                                  </div>
                                 </div>
                               </div>
                             </CardContent>

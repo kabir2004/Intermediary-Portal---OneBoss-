@@ -227,8 +227,9 @@ const ClientDetails = () => {
   const [selectedPlanForDetails, setSelectedPlanForDetails] = useState<string | null>(null);
   const [selectedFundAccount, setSelectedFundAccount] = useState<string | null>(null);
   const [fundAccountAllocationsView, setFundAccountAllocationsView] = useState<"chart" | "table">("chart");
-  const [transactionsDisplayOption, setTransactionsDisplayOption] = useState("Valid and Pending");
-  const [transactionsSortBy, setTransactionsSortBy] = useState("Trade Date");
+  const [transactionsDisplayOption, setTransactionsDisplayOption] = useState("All");
+  const [transactionsSortBy, setTransactionsSortBy] = useState("Sort by Trade Date");
+  const [selectedAccountFilter, setSelectedAccountFilter] = useState("Selected Account");
   const [selectedTransaction, setSelectedTransaction] = useState<string | null>(null);
   const [transactionDetailTab, setTransactionDetailTab] = useState("details");
   const [isDepositDialogOpen, setIsDepositDialogOpen] = useState(false);
@@ -1143,6 +1144,1169 @@ const ClientDetails = () => {
     return planData?.investments || [];
   };
   
+  // Helper function to calculate KYC Age in days
+  const calculateKYCAge = (kycDate: string): string => {
+    if (!kycDate) return "";
+    const [month, day, year] = kycDate.split("/").map(Number);
+    const kycDateObj = new Date(year, month - 1, day);
+    const today = new Date();
+    const diffTime = Math.abs(today.getTime() - kycDateObj.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return `${diffDays} days Old`;
+  };
+
+  // Get plan-specific details
+  const getPlanDetails = (planId: string | null) => {
+    if (!planId) {
+      return {
+        accountDesignation: "Client Name",
+        description: "",
+        intentOfUse: "",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "",
+        intermediaryAccountCode: "",
+        startDate: "",
+        endDate: "",
+        kycOnFileDate: "",
+        kycAge: "",
+        kycOriginalReceivedDate: "",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      };
+    }
+
+    // Generate unique dates based on client ID and plan ID
+    const generateUniqueDates = (clientId: string | undefined, planId: string) => {
+      // Create a hash from client ID and plan ID for consistent but unique dates
+      const clientHash = (clientId || "").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const planHash = planId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const hash = clientHash + planHash;
+      
+      // Generate dates based on hash to ensure uniqueness per client/plan
+      const baseYear = 2015 + (hash % 10); // Years between 2015-2024
+      const baseMonth = 1 + ((hash * 7) % 12); // Months 1-12
+      const baseDay = 1 + ((hash * 13) % 28); // Days 1-28
+      
+      const startDate = new Date(baseYear, baseMonth - 1, baseDay);
+      const kycOnFileDate = new Date(startDate);
+      kycOnFileDate.setDate(kycOnFileDate.getDate() - (7 + (hash % 14))); // 7-20 days before
+      const kycOriginalDate = new Date(kycOnFileDate);
+      kycOriginalDate.setDate(kycOriginalDate.getDate() - (5 + (hash % 10))); // 5-14 days before
+      
+      const formatDate = (date: Date) => {
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${month}/${day}/${year}`;
+      };
+      
+      return {
+        startDate: formatDate(startDate),
+        kycOnFileDate: formatDate(kycOnFileDate),
+        kycAge: calculateKYCAge(formatDate(kycOnFileDate)),
+        kycOriginalReceivedDate: formatDate(kycOriginalDate),
+      };
+    };
+
+    const planDetailsMap: Record<string, any> = {
+      "340009": {
+        accountDesignation: "Joint",
+        description: "Joint OPEN account",
+        intentOfUse: "Retirement savings",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "84732956",
+        intermediaryAccountCode: "847329561",
+        startDate: "06/18/2019",
+        endDate: "",
+        kycOnFileDate: "06/12/2019",
+        kycAge: calculateKYCAge("06/12/2019"),
+        kycOriginalReceivedDate: "06/08/2019",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "0137617685": {
+        accountDesignation: "Client Name",
+        description: "RRIF account for retirement income",
+        intentOfUse: "Retirement income",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: true,
+        recipient: "Individual",
+        intermediaryCode: "29184763",
+        intermediaryAccountCode: "291847632",
+        startDate: "11/22/2017",
+        endDate: "",
+        kycOnFileDate: "11/15/2017",
+        kycAge: calculateKYCAge("11/15/2017"),
+        kycOriginalReceivedDate: "11/10/2017",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRSP-4521": {
+        accountDesignation: "Client Name",
+        description: "RRSP retirement savings",
+        intentOfUse: "Retirement savings",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "73849216",
+        intermediaryAccountCode: "738492163",
+        startDate: "04/14/2021",
+        endDate: "",
+        kycOnFileDate: "04/08/2021",
+        kycAge: calculateKYCAge("04/08/2021"),
+        kycOriginalReceivedDate: "04/05/2021",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "TFSA-7892": {
+        accountDesignation: "Client Name",
+        description: "TFSA tax-free savings",
+        intentOfUse: "Tax-free growth",
+        frozen: true,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "56372849",
+        intermediaryAccountCode: "563728494",
+        startDate: "09/25/2020",
+        endDate: "",
+        kycOnFileDate: "09/18/2020",
+        kycAge: calculateKYCAge("09/18/2020"),
+        kycOriginalReceivedDate: "09/15/2020",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RESP-3456": {
+        accountDesignation: "Individual",
+        description: "RESP for children's education",
+        intentOfUse: "Education savings",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "48572931",
+        intermediaryAccountCode: "485729315",
+        startDate: "08/30/2022",
+        endDate: "",
+        kycOnFileDate: "08/24/2022",
+        kycAge: calculateKYCAge("08/24/2022"),
+        kycOriginalReceivedDate: "08/20/2022",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "NR-7890": {
+        accountDesignation: "Individual",
+        description: "Non-registered investment account",
+        intentOfUse: "Taxable investment growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "67294815",
+        intermediaryAccountCode: "672948156",
+        startDate: "03/17/2023",
+        endDate: "",
+        kycOnFileDate: "03/12/2023",
+        kycAge: calculateKYCAge("03/12/2023"),
+        kycOriginalReceivedDate: "03/08/2023",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "TFSA-1234": {
+        accountDesignation: "Individual",
+        description: "TFSA conservative income fund",
+        intentOfUse: "Conservative tax-free growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "81937462",
+        intermediaryAccountCode: "819374627",
+        startDate: "01/22/2024",
+        endDate: "",
+        kycOnFileDate: "01/16/2024",
+        kycAge: calculateKYCAge("01/16/2024"),
+        kycOriginalReceivedDate: "01/12/2024",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRSP-5678": {
+        accountDesignation: "Individual",
+        description: "RRSP retirement savings plan",
+        intentOfUse: "Retirement savings",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "38475629",
+        intermediaryAccountCode: "384756298",
+        startDate: "07/11/2021",
+        endDate: "",
+        kycOnFileDate: "07/05/2021",
+        kycAge: calculateKYCAge("07/05/2021"),
+        kycOriginalReceivedDate: "07/01/2021",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "LIF-2345": {
+        accountDesignation: "Individual",
+        description: "LIF retirement income account",
+        intentOfUse: "Retirement income",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: true,
+        recipient: "Individual",
+        intermediaryCode: "74628539",
+        intermediaryAccountCode: "746285399",
+        startDate: "12/05/2019",
+        endDate: "",
+        kycOnFileDate: "11/28/2019",
+        kycAge: calculateKYCAge("11/28/2019"),
+        kycOriginalReceivedDate: "11/25/2019",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "TFSA-4567": {
+        accountDesignation: "Individual",
+        description: "TFSA global equity fund",
+        intentOfUse: "Aggressive tax-free growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "72938465",
+        intermediaryAccountCode: "729384651",
+        startDate: "05/28/2022",
+        endDate: "",
+        kycOnFileDate: "05/22/2022",
+        kycAge: calculateKYCAge("05/22/2022"),
+        kycOriginalReceivedDate: "05/18/2022",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRSP-8901": {
+        accountDesignation: "Individual",
+        description: "RRSP Canadian growth fund",
+        intentOfUse: "Long-term growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "29384756",
+        intermediaryAccountCode: "293847562",
+        startDate: "10/14/2020",
+        endDate: "",
+        kycOnFileDate: "10/08/2020",
+        kycAge: calculateKYCAge("10/08/2020"),
+        kycOriginalReceivedDate: "10/04/2020",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "NR-3456": {
+        accountDesignation: "Individual",
+        description: "Non-registered bond fund",
+        intentOfUse: "Fixed income investment",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "64738291",
+        intermediaryAccountCode: "647382913",
+        startDate: "06/19/2023",
+        endDate: "",
+        kycOnFileDate: "06/13/2023",
+        kycAge: calculateKYCAge("06/13/2023"),
+        kycOriginalReceivedDate: "06/09/2023",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "DCPP-6789": {
+        accountDesignation: "Individual",
+        description: "DCPP technology fund",
+        intentOfUse: "Technology sector growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: true,
+        recipient: "Individual",
+        intermediaryCode: "93847562",
+        intermediaryAccountCode: "938475624",
+        startDate: "02/16/2020",
+        endDate: "",
+        kycOnFileDate: "02/10/2020",
+        kycAge: calculateKYCAge("02/10/2020"),
+        kycOriginalReceivedDate: "02/06/2020",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRIF-9012": {
+        accountDesignation: "Individual",
+        description: "RRIF dividend fund",
+        intentOfUse: "Retirement income",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: true,
+        recipient: "Individual",
+        intermediaryCode: "56293847",
+        intermediaryAccountCode: "562938475",
+        startDate: "09/12/2018",
+        endDate: "",
+        kycOnFileDate: "09/06/2018",
+        kycAge: calculateKYCAge("09/06/2018"),
+        kycOriginalReceivedDate: "09/02/2018",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "LIF-5678": {
+        accountDesignation: "Individual",
+        description: "LIF conservative income fund",
+        intentOfUse: "Conservative retirement income",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: true,
+        recipient: "Individual",
+        intermediaryCode: "62938475",
+        intermediaryAccountCode: "629384756",
+        startDate: "03/24/2019",
+        endDate: "",
+        kycOnFileDate: "03/18/2019",
+        kycAge: calculateKYCAge("03/18/2019"),
+        kycOriginalReceivedDate: "03/14/2019",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRSP-1234": {
+        accountDesignation: "Individual",
+        description: "RRSP global equity fund",
+        intentOfUse: "Global growth strategy",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "47582936",
+        intermediaryAccountCode: "475829367",
+        startDate: "12/08/2021",
+        endDate: "",
+        kycOnFileDate: "12/02/2021",
+        kycAge: calculateKYCAge("12/02/2021"),
+        kycOriginalReceivedDate: "11/28/2021",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "TFSA-5678": {
+        accountDesignation: "Individual",
+        description: "TFSA monthly income fund",
+        intentOfUse: "Tax-free income",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "75829364",
+        intermediaryAccountCode: "758293648",
+        startDate: "07/30/2022",
+        endDate: "",
+        kycOnFileDate: "07/24/2022",
+        kycAge: calculateKYCAge("07/24/2022"),
+        kycOriginalReceivedDate: "07/20/2022",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RESP-2345": {
+        accountDesignation: "Individual",
+        description: "RESP Canadian equity fund",
+        intentOfUse: "Education savings growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "83927465",
+        intermediaryAccountCode: "839274659",
+        startDate: "05/19/2020",
+        endDate: "",
+        kycOnFileDate: "05/13/2020",
+        kycAge: calculateKYCAge("05/13/2020"),
+        kycOriginalReceivedDate: "05/09/2020",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "TFSA-8901": {
+        accountDesignation: "Individual",
+        description: "TFSA balanced fund",
+        intentOfUse: "Balanced tax-free growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "39274658",
+        intermediaryAccountCode: "392746581",
+        startDate: "11/26/2023",
+        endDate: "",
+        kycOnFileDate: "11/20/2023",
+        kycAge: calculateKYCAge("11/20/2023"),
+        kycOriginalReceivedDate: "11/16/2023",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRSP-3456": {
+        accountDesignation: "Individual",
+        description: "RRSP global growth fund",
+        intentOfUse: "Aggressive global growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "28473956",
+        intermediaryAccountCode: "284739562",
+        startDate: "01/28/2019",
+        endDate: "",
+        kycOnFileDate: "01/22/2019",
+        kycAge: calculateKYCAge("01/22/2019"),
+        kycOriginalReceivedDate: "01/18/2019",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "NR-6789": {
+        accountDesignation: "Individual",
+        description: "Non-registered dividend fund",
+        intentOfUse: "Taxable dividend income",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "84739562",
+        intermediaryAccountCode: "847395623",
+        startDate: "04/11/2021",
+        endDate: "",
+        kycOnFileDate: "04/05/2021",
+        kycAge: calculateKYCAge("04/05/2021"),
+        kycOriginalReceivedDate: "04/01/2021",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRSP-5678": {
+        accountDesignation: "Individual",
+        description: "RRSP balanced growth fund",
+        intentOfUse: "Balanced retirement growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "46738291",
+        intermediaryAccountCode: "467382914",
+        startDate: "08/03/2022",
+        endDate: "",
+        kycOnFileDate: "07/28/2022",
+        kycAge: calculateKYCAge("07/28/2022"),
+        kycOriginalReceivedDate: "07/24/2022",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRIF-0123": {
+        accountDesignation: "Individual",
+        description: "RRIF conservative fund",
+        intentOfUse: "Conservative retirement income",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: true,
+        recipient: "Individual",
+        intermediaryCode: "58293746",
+        intermediaryAccountCode: "582937465",
+        startDate: "06/14/2023",
+        endDate: "",
+        kycOnFileDate: "06/08/2023",
+        kycAge: calculateKYCAge("06/08/2023"),
+        kycOriginalReceivedDate: "06/04/2023",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "OPEN-6789": {
+        accountDesignation: "Joint",
+        description: "Joint OPEN Canadian equity account",
+        intentOfUse: "Joint investment growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "47382956",
+        intermediaryAccountCode: "473829566",
+        startDate: "09/30/2022",
+        endDate: "",
+        kycOnFileDate: "09/25/2022",
+        kycAge: calculateKYCAge("09/25/2022"),
+        kycOriginalReceivedDate: "09/20/2022",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "TFSA-2345": {
+        accountDesignation: "Individual",
+        description: "TFSA income fund",
+        intentOfUse: "Tax-free income generation",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "64829173",
+        intermediaryAccountCode: "648291737",
+        startDate: "11/25/2023",
+        endDate: "",
+        kycOnFileDate: "11/20/2023",
+        kycAge: calculateKYCAge("11/20/2023"),
+        kycOriginalReceivedDate: "11/15/2023",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRSP-7890": {
+        accountDesignation: "Individual",
+        description: "RRSP technology fund",
+        intentOfUse: "Technology sector growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "57392846",
+        intermediaryAccountCode: "573928468",
+        startDate: "03/12/2021",
+        endDate: "",
+        kycOnFileDate: "03/08/2021",
+        kycAge: calculateKYCAge("03/08/2021"),
+        kycOriginalReceivedDate: "03/04/2021",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "LIF-3456": {
+        accountDesignation: "Individual",
+        description: "LIF balanced fund",
+        intentOfUse: "Balanced retirement income",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: true,
+        recipient: "Individual",
+        intermediaryCode: "73928465",
+        intermediaryAccountCode: "739284659",
+        startDate: "04/05/2022",
+        endDate: "",
+        kycOnFileDate: "04/01/2022",
+        kycAge: calculateKYCAge("04/01/2022"),
+        kycOriginalReceivedDate: "03/28/2022",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "NR-4567": {
+        accountDesignation: "Individual",
+        description: "Non-registered income fund",
+        intentOfUse: "Taxable income generation",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "82937461",
+        intermediaryAccountCode: "829374611",
+        startDate: "03/28/2023",
+        endDate: "",
+        kycOnFileDate: "03/25/2023",
+        kycAge: calculateKYCAge("03/25/2023"),
+        kycOriginalReceivedDate: "03/20/2023",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRSP-9012": {
+        accountDesignation: "Individual",
+        description: "RRSP global growth fund",
+        intentOfUse: "Aggressive global growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "39485762",
+        intermediaryAccountCode: "394857622",
+        startDate: "02/20/2021",
+        endDate: "",
+        kycOnFileDate: "02/15/2021",
+        kycAge: calculateKYCAge("02/15/2021"),
+        kycOriginalReceivedDate: "02/10/2021",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RESP-5678": {
+        accountDesignation: "Individual",
+        description: "RESP Canadian equity fund",
+        intentOfUse: "Education savings growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "48572936",
+        intermediaryAccountCode: "485729363",
+        startDate: "08/15/2023",
+        endDate: "",
+        kycOnFileDate: "08/10/2023",
+        kycAge: calculateKYCAge("08/10/2023"),
+        kycOriginalReceivedDate: "08/06/2023",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRIF-0123": {
+        accountDesignation: "Individual",
+        description: "RRIF Canadian equity fund",
+        intentOfUse: "Retirement income growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: true,
+        recipient: "Individual",
+        intermediaryCode: "75829364",
+        intermediaryAccountCode: "758293644",
+        startDate: "07/22/2021",
+        endDate: "",
+        kycOnFileDate: "07/18/2021",
+        kycAge: calculateKYCAge("07/18/2021"),
+        kycOriginalReceivedDate: "07/14/2021",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "TFSA-3456": {
+        accountDesignation: "Individual",
+        description: "TFSA income fund",
+        intentOfUse: "Tax-free income",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "28475693",
+        intermediaryAccountCode: "284756935",
+        startDate: "09/10/2023",
+        endDate: "",
+        kycOnFileDate: "09/05/2023",
+        kycAge: calculateKYCAge("09/05/2023"),
+        kycOriginalReceivedDate: "09/01/2023",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "NR-7890": {
+        accountDesignation: "Individual",
+        description: "Non-registered balanced fund",
+        intentOfUse: "Balanced taxable growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "94736285",
+        intermediaryAccountCode: "947362856",
+        startDate: "11/05/2022",
+        endDate: "",
+        kycOnFileDate: "11/01/2022",
+        kycAge: calculateKYCAge("11/01/2022"),
+        kycOriginalReceivedDate: "10/28/2022",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRSP-2345": {
+        accountDesignation: "Individual",
+        description: "RRSP global equity fund",
+        intentOfUse: "Global growth strategy",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "37482956",
+        intermediaryAccountCode: "374829567",
+        startDate: "03/10/2021",
+        endDate: "",
+        kycOnFileDate: "03/05/2021",
+        kycAge: calculateKYCAge("03/05/2021"),
+        kycOriginalReceivedDate: "03/01/2021",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "TFSA-6789": {
+        accountDesignation: "Individual",
+        description: "TFSA Canadian equity fund",
+        intentOfUse: "Tax-free Canadian growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "63927485",
+        intermediaryAccountCode: "639274858",
+        startDate: "08/20/2022",
+        endDate: "",
+        kycOnFileDate: "08/15/2022",
+        kycAge: calculateKYCAge("08/15/2022"),
+        kycOriginalReceivedDate: "08/11/2022",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RESP-3456": {
+        accountDesignation: "Individual",
+        description: "RESP dividend fund",
+        intentOfUse: "Education savings with dividends",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "59283746",
+        intermediaryAccountCode: "592837469",
+        startDate: "05/15/2021",
+        endDate: "",
+        kycOnFileDate: "05/10/2021",
+        kycAge: calculateKYCAge("05/10/2021"),
+        kycOriginalReceivedDate: "05/06/2021",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "TFSA-7890": {
+        accountDesignation: "Individual",
+        description: "TFSA income fund",
+        intentOfUse: "Tax-free income generation",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "72938461",
+        intermediaryAccountCode: "729384611",
+        startDate: "10/30/2023",
+        endDate: "",
+        kycOnFileDate: "10/25/2023",
+        kycAge: calculateKYCAge("10/25/2023"),
+        kycOriginalReceivedDate: "10/21/2023",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRSP-4567": {
+        accountDesignation: "Individual",
+        description: "RRSP technology fund",
+        intentOfUse: "Technology sector growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "38475629",
+        intermediaryAccountCode: "384756292",
+        startDate: "01/25/2020",
+        endDate: "",
+        kycOnFileDate: "01/20/2020",
+        kycAge: "1926 days Old",
+        kycOriginalReceivedDate: "01/20/2020",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRIF-8901": {
+        accountDesignation: "Individual",
+        description: "RRIF Canadian equity fund",
+        intentOfUse: "Retirement income growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: true,
+        recipient: "Individual",
+        intermediaryCode: "48372659",
+        intermediaryAccountCode: "483726593",
+        startDate: "06/18/2022",
+        endDate: "",
+        kycOnFileDate: "06/15/2022",
+        kycAge: "1049 days Old",
+        kycOriginalReceivedDate: "06/15/2022",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "NR-1234": {
+        accountDesignation: "Individual",
+        description: "Non-registered balanced fund",
+        intentOfUse: "Balanced taxable investment",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "73629485",
+        intermediaryAccountCode: "736294854",
+        startDate: "09/12/2023",
+        endDate: "",
+        kycOnFileDate: "09/08/2023",
+        kycAge: "595 days Old",
+        kycOriginalReceivedDate: "09/08/2023",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "TFSA-5678": {
+        accountDesignation: "Individual",
+        description: "TFSA global equity fund",
+        intentOfUse: "Tax-free global growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "85937264",
+        intermediaryAccountCode: "859372645",
+        startDate: "04/05/2022",
+        endDate: "",
+        kycOnFileDate: "04/01/2022",
+        kycAge: "1123 days Old",
+        kycOriginalReceivedDate: "04/01/2022",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "RRSP-9012": {
+        accountDesignation: "Individual",
+        description: "RRSP global growth fund",
+        intentOfUse: "Aggressive global growth",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "93746285",
+        intermediaryAccountCode: "937462856",
+        startDate: "02/14/2021",
+        endDate: "",
+        kycOnFileDate: "02/10/2021",
+        kycAge: "1505 days Old",
+        kycOriginalReceivedDate: "02/10/2021",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "LIF-6789": {
+        accountDesignation: "Individual",
+        description: "LIF dividend fund",
+        intentOfUse: "Retirement income with dividends",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: true,
+        recipient: "Individual",
+        intermediaryCode: "64738295",
+        intermediaryAccountCode: "647382957",
+        startDate: "07/28/2021",
+        endDate: "",
+        kycOnFileDate: "07/25/2021",
+        kycAge: "1375 days Old",
+        kycOriginalReceivedDate: "07/25/2021",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+      "OPEN-0123": {
+        accountDesignation: "Joint",
+        description: "Joint OPEN conservative income account",
+        intentOfUse: "Joint conservative income",
+        frozen: false,
+        fullFreeze: false,
+        groupAccount: false,
+        groupAccountId: "",
+        leveraged: false,
+        loanNumber: "",
+        lockedIn: false,
+        recipient: "Individual",
+        intermediaryCode: "53847296",
+        intermediaryAccountCode: "538472968",
+        startDate: "12/10/2023",
+        endDate: "",
+        kycOnFileDate: "12/05/2023",
+        kycAge: "507 days Old",
+        kycOriginalReceivedDate: "12/05/2023",
+        revenueModel: "Commissions",
+        feeForServiceAmount: "",
+        feeForServiceStartDate: "",
+        feeForServiceApproved: false,
+      },
+    };
+
+    const existingDetails = planDetailsMap[planId];
+    if (existingDetails) {
+      return existingDetails;
+    }
+    
+    // Generate unique dates for plans not in the map based on client ID and plan ID
+    const uniqueDates = generateUniqueDates(id, planId);
+    
+    return {
+      accountDesignation: "Client Name",
+      description: "",
+      intentOfUse: "",
+      frozen: false,
+      fullFreeze: false,
+      groupAccount: false,
+      groupAccountId: "",
+      leveraged: false,
+      loanNumber: "",
+      lockedIn: false,
+      recipient: "Individual",
+      intermediaryCode: "",
+      intermediaryAccountCode: planId,
+      ...uniqueDates,
+      endDate: "",
+      revenueModel: "Commissions",
+      feeForServiceAmount: "",
+      feeForServiceStartDate: "",
+      feeForServiceApproved: false,
+    };
+  };
+  
   // Set default selected plan on mount or when client changes
   useEffect(() => {
     if (plansList.length > 0) {
@@ -1167,6 +2331,27 @@ const ClientDetails = () => {
   
   // Get selected plan data for details
   const selectedPlanData = plansList.find(p => p.id === selectedPlanForDetails) || (plansList.length > 0 ? plansList[0] : null);
+  
+  // Get plan-specific details - memoized to update when client or plan changes
+  const basePlanDetails = useMemo(() => getPlanDetails(selectedPlanForDetails), [selectedPlanForDetails, id]);
+  
+  // Determine account designation based on plan category
+  const getAccountDesignation = () => {
+    if (!selectedPlanData) return "Client Name";
+    const category = selectedPlanData.category || "";
+    if (category.toLowerCase().includes("joint")) {
+      return "Joint";
+    } else if (category.toLowerCase().includes("individual")) {
+      return "Individual";
+    }
+    return basePlanDetails.accountDesignation || "Client Name";
+  };
+  
+  // Merge base plan details with dynamic account designation
+  const planDetails = {
+    ...basePlanDetails,
+    accountDesignation: getAccountDesignation(),
+  };
   
   // Get fund accounts for selected plan only
   const planInvestments = getPlanInvestments(selectedPlanForDetails);
@@ -1206,14 +2391,14 @@ const ClientDetails = () => {
     shareBalance: string;
   }>> = {
     "MFC-724": [
-      { id: "1", date: "04/25/2025", grossAmount: "$0.82", netAmount: "$0.82", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "11.8280" },
-      { id: "2", date: "02/21/2025", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "10.8280" },
-      { id: "3", date: "01/21/2025", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "8.8280" },
-      { id: "4", date: "12/20/2024", grossAmount: "$0.69", netAmount: "$0.69", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "6.8280" },
-      { id: "5", date: "11/20/2024", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "4.8280" },
-      { id: "6", date: "10/20/2024", grossAmount: "$0.56", netAmount: "$0.56", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "2.8280" },
-      { id: "7", date: "09/20/2024", grossAmount: "$0.42", netAmount: "$0.42", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "0.8280" },
-      { id: "8", date: "08/20/2024", grossAmount: "$0.27", netAmount: "$0.27", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "0.0000" },
+    { id: "1", date: "04/25/2025", grossAmount: "$0.82", netAmount: "$0.82", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "11.8280" },
+    { id: "2", date: "02/21/2025", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "10.8280" },
+    { id: "3", date: "01/21/2025", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "8.8280" },
+    { id: "4", date: "12/20/2024", grossAmount: "$0.69", netAmount: "$0.69", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "6.8280" },
+    { id: "5", date: "11/20/2024", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "4.8280" },
+    { id: "6", date: "10/20/2024", grossAmount: "$0.56", netAmount: "$0.56", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "2.8280" },
+    { id: "7", date: "09/20/2024", grossAmount: "$0.42", netAmount: "$0.42", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "0.8280" },
+    { id: "8", date: "08/20/2024", grossAmount: "$0.27", netAmount: "$0.27", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "0.0000" },
     ],
     "MFC-2238": [
       { id: "1", date: "04/22/2025", grossAmount: "$1.15", netAmount: "$1.15", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "15.2340" },
@@ -1275,6 +2460,7 @@ const ClientDetails = () => {
     ],
     "AGF-185": [
       { id: "1", date: "04/20/2025", grossAmount: "$0.00", netAmount: "$0.00", price: "$0.00", status: "Valid", type: "Reinvested Distribution", shareBalance: "0.0000" },
+      { id: "2", date: "03/20/2025", grossAmount: "$0.00", netAmount: "$0.00", price: "$0.00", status: "Valid", type: "Initial Purchase", shareBalance: "0.0000" },
     ],
     "TD-0000": [
       { id: "1", date: "04/29/2025", grossAmount: "$3.25", netAmount: "$3.25", price: "$19.8765", status: "Valid", type: "Reinvested Distribution", shareBalance: "6768.9012" },
@@ -1292,6 +2478,124 @@ const ClientDetails = () => {
       { id: "4", date: "01/30/2025", grossAmount: "$1.26", netAmount: "$1.26", price: "$13.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "4722.6789" },
       { id: "5", date: "12/30/2024", grossAmount: "$180.00", netAmount: "$180.00", price: "$13.5432", status: "Valid", type: "Purchase PAC", shareBalance: "4713.6789" },
       { id: "6", date: "11/30/2024", grossAmount: "$1.08", netAmount: "$1.08", price: "$13.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "4578.6789" },
+    ],
+    "MANULIFE-1111": [
+      { id: "1", date: "04/25/2025", grossAmount: "$2.85", netAmount: "$2.85", price: "$18.7654", status: "Valid", type: "Reinvested Distribution", shareBalance: "4762.1234" },
+      { id: "2", date: "03/10/2025", grossAmount: "$150.00", netAmount: "$150.00", price: "$18.7654", status: "Valid", type: "Purchase PAC", shareBalance: "4760.1234" },
+      { id: "3", date: "02/10/2025", grossAmount: "$150.00", netAmount: "$150.00", price: "$18.7654", status: "Valid", type: "Purchase PAC", shareBalance: "4678.1234" },
+      { id: "4", date: "01/10/2025", grossAmount: "$2.48", netAmount: "$2.48", price: "$18.7654", status: "Valid", type: "Reinvested Distribution", shareBalance: "4596.1234" },
+      { id: "5", date: "12/10/2024", grossAmount: "$150.00", netAmount: "$150.00", price: "$18.7654", status: "Valid", type: "Purchase PAC", shareBalance: "4591.1234" },
+      { id: "6", date: "11/10/2024", grossAmount: "$2.12", netAmount: "$2.12", price: "$18.7654", status: "Valid", type: "Reinvested Distribution", shareBalance: "4511.1234" },
+      { id: "7", date: "10/10/2024", grossAmount: "$150.00", netAmount: "$150.00", price: "$18.7654", status: "Valid", type: "Purchase PAC", shareBalance: "4498.1234" },
+    ],
+    "SUNLIFE-2222": [
+      { id: "1", date: "04/22/2025", grossAmount: "$3.15", netAmount: "$3.15", price: "$16.4321", status: "Valid", type: "Reinvested Distribution", shareBalance: "9543.2567" },
+      { id: "2", date: "03/22/2025", grossAmount: "$200.00", netAmount: "$200.00", price: "$16.4321", status: "Valid", type: "Purchase PAC", shareBalance: "9534.2567" },
+      { id: "3", date: "02/22/2025", grossAmount: "$200.00", netAmount: "$200.00", price: "$16.4321", status: "Valid", type: "Purchase PAC", shareBalance: "9412.2567" },
+      { id: "4", date: "01/22/2025", grossAmount: "$2.73", netAmount: "$2.73", price: "$16.4321", status: "Valid", type: "Reinvested Distribution", shareBalance: "9290.2567" },
+      { id: "5", date: "12/22/2024", grossAmount: "$200.00", netAmount: "$200.00", price: "$16.4321", status: "Valid", type: "Purchase PAC", shareBalance: "9276.2567" },
+      { id: "6", date: "11/22/2024", grossAmount: "$2.31", netAmount: "$2.31", price: "$16.4321", status: "Valid", type: "Reinvested Distribution", shareBalance: "9154.2567" },
+      { id: "7", date: "10/22/2024", grossAmount: "$200.00", netAmount: "$200.00", price: "$16.4321", status: "Valid", type: "Purchase PAC", shareBalance: "9140.2567" },
+    ],
+    "IG-3333": [
+      { id: "1", date: "04/15/2025", grossAmount: "$1.92", netAmount: "$1.92", price: "$21.9876", status: "Valid", type: "Reinvested Distribution", shareBalance: "2405.6123" },
+      { id: "2", date: "03/15/2025", grossAmount: "$100.00", netAmount: "$100.00", price: "$21.9876", status: "Valid", type: "Purchase PAC", shareBalance: "2401.6123" },
+      { id: "3", date: "02/15/2025", grossAmount: "$100.00", netAmount: "$100.00", price: "$21.9876", status: "Valid", type: "Purchase PAC", shareBalance: "2356.6123" },
+      { id: "4", date: "01/15/2025", grossAmount: "$1.67", netAmount: "$1.67", price: "$21.9876", status: "Valid", type: "Reinvested Distribution", shareBalance: "2311.6123" },
+      { id: "5", date: "12/15/2024", grossAmount: "$100.00", netAmount: "$100.00", price: "$21.9876", status: "Valid", type: "Purchase PAC", shareBalance: "2304.6123" },
+      { id: "6", date: "11/15/2024", grossAmount: "$1.42", netAmount: "$1.42", price: "$21.9876", status: "Valid", type: "Reinvested Distribution", shareBalance: "2259.6123" },
+    ],
+    "MACKENZIE-4444": [
+      { id: "1", date: "04/20/2025", grossAmount: "$3.45", netAmount: "$3.45", price: "$19.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "4001.2345" },
+      { id: "2", date: "03/20/2025", grossAmount: "$175.00", netAmount: "$175.00", price: "$19.5432", status: "Valid", type: "Purchase PAC", shareBalance: "3983.2345" },
+      { id: "3", date: "02/20/2025", grossAmount: "$175.00", netAmount: "$175.00", price: "$19.5432", status: "Valid", type: "Purchase PAC", shareBalance: "3891.2345" },
+      { id: "4", date: "01/20/2025", grossAmount: "$2.99", netAmount: "$2.99", price: "$19.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "3799.2345" },
+      { id: "5", date: "12/20/2024", grossAmount: "$175.00", netAmount: "$175.00", price: "$19.5432", status: "Valid", type: "Purchase PAC", shareBalance: "3784.2345" },
+      { id: "6", date: "11/20/2024", grossAmount: "$2.53", netAmount: "$2.53", price: "$19.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "3692.2345" },
+      { id: "7", date: "10/20/2024", grossAmount: "$175.00", netAmount: "$175.00", price: "$19.5432", status: "Valid", type: "Purchase PAC", shareBalance: "3677.2345" },
+    ],
+    "AGF-5555": [
+      { id: "1", date: "04/18/2025", grossAmount: "$1.25", netAmount: "$1.25", price: "$12.3456", status: "Valid", type: "Reinvested Distribution", shareBalance: "2801.2345" },
+      { id: "2", date: "03/18/2025", grossAmount: "$85.00", netAmount: "$85.00", price: "$12.3456", status: "Valid", type: "Purchase PAC", shareBalance: "2794.2345" },
+      { id: "3", date: "02/18/2025", grossAmount: "$85.00", netAmount: "$85.00", price: "$12.3456", status: "Valid", type: "Purchase PAC", shareBalance: "2726.2345" },
+      { id: "4", date: "01/18/2025", grossAmount: "$1.08", netAmount: "$1.08", price: "$12.3456", status: "Valid", type: "Reinvested Distribution", shareBalance: "2658.2345" },
+      { id: "5", date: "12/18/2024", grossAmount: "$85.00", netAmount: "$85.00", price: "$12.3456", status: "Valid", type: "Purchase PAC", shareBalance: "2650.2345" },
+      { id: "6", date: "11/18/2024", grossAmount: "$0.91", netAmount: "$0.91", price: "$12.3456", status: "Valid", type: "Reinvested Distribution", shareBalance: "2582.2345" },
+    ],
+    "TD-6666": [
+      { id: "1", date: "04/05/2025", grossAmount: "$4.25", netAmount: "$4.25", price: "$35.6789", status: "Valid", type: "Reinvested Distribution", shareBalance: "6578.9012" },
+      { id: "2", date: "03/05/2025", grossAmount: "$300.00", netAmount: "$300.00", price: "$35.6789", status: "Valid", type: "Purchase PAC", shareBalance: "6565.9012" },
+      { id: "3", date: "02/05/2025", grossAmount: "$300.00", netAmount: "$300.00", price: "$35.6789", status: "Valid", type: "Purchase PAC", shareBalance: "6476.9012" },
+      { id: "4", date: "01/05/2025", grossAmount: "$3.68", netAmount: "$3.68", price: "$35.6789", status: "Valid", type: "Reinvested Distribution", shareBalance: "6387.9012" },
+      { id: "5", date: "12/05/2024", grossAmount: "$300.00", netAmount: "$300.00", price: "$35.6789", status: "Valid", type: "Purchase PAC", shareBalance: "6377.9012" },
+      { id: "6", date: "11/05/2024", grossAmount: "$3.11", netAmount: "$3.11", price: "$35.6789", status: "Valid", type: "Reinvested Distribution", shareBalance: "6288.9012" },
+      { id: "7", date: "10/05/2024", grossAmount: "$300.00", netAmount: "$300.00", price: "$35.6789", status: "Valid", type: "Purchase PAC", shareBalance: "6278.9012" },
+    ],
+    "RBC-7777": [
+      { id: "1", date: "04/24/2025", grossAmount: "$3.25", netAmount: "$3.25", price: "$17.8901", status: "Valid", type: "Reinvested Distribution", shareBalance: "8145.6789" },
+      { id: "2", date: "03/18/2025", grossAmount: "$225.00", netAmount: "$225.00", price: "$17.8901", status: "Valid", type: "Purchase PAC", shareBalance: "8132.6789" },
+      { id: "3", date: "02/18/2025", grossAmount: "$225.00", netAmount: "$225.00", price: "$17.8901", status: "Valid", type: "Purchase PAC", shareBalance: "7999.6789" },
+      { id: "4", date: "01/18/2025", grossAmount: "$2.82", netAmount: "$2.82", price: "$17.8901", status: "Valid", type: "Reinvested Distribution", shareBalance: "7866.6789" },
+      { id: "5", date: "12/18/2024", grossAmount: "$225.00", netAmount: "$225.00", price: "$17.8901", status: "Valid", type: "Purchase PAC", shareBalance: "7850.6789" },
+      { id: "6", date: "11/18/2024", grossAmount: "$2.39", netAmount: "$2.39", price: "$17.8901", status: "Valid", type: "Reinvested Distribution", shareBalance: "7717.6789" },
+    ],
+    "BMO-8888": [
+      { id: "1", date: "04/19/2025", grossAmount: "$2.15", netAmount: "$2.15", price: "$13.4567", status: "Valid", type: "Reinvested Distribution", shareBalance: "7312.3456" },
+      { id: "2", date: "03/12/2025", grossAmount: "$180.00", netAmount: "$180.00", price: "$13.4567", status: "Valid", type: "Purchase PAC", shareBalance: "7298.3456" },
+      { id: "3", date: "02/12/2025", grossAmount: "$180.00", netAmount: "$180.00", price: "$13.4567", status: "Valid", type: "Purchase PAC", shareBalance: "7164.3456" },
+      { id: "4", date: "01/12/2025", grossAmount: "$1.87", netAmount: "$1.87", price: "$13.4567", status: "Valid", type: "Reinvested Distribution", shareBalance: "7030.3456" },
+      { id: "5", date: "12/12/2024", grossAmount: "$180.00", netAmount: "$180.00", price: "$13.4567", status: "Valid", type: "Purchase PAC", shareBalance: "7016.3456" },
+      { id: "6", date: "11/12/2024", grossAmount: "$1.59", netAmount: "$1.59", price: "$13.4567", status: "Valid", type: "Reinvested Distribution", shareBalance: "6882.3456" },
+    ],
+    "CIBC-9999": [
+      { id: "1", date: "04/14/2025", grossAmount: "$4.15", netAmount: "$4.15", price: "$27.1234", status: "Valid", type: "Reinvested Distribution", shareBalance: "6189.0123" },
+      { id: "2", date: "03/14/2025", grossAmount: "$275.00", netAmount: "$275.00", price: "$27.1234", status: "Valid", type: "Purchase PAC", shareBalance: "6174.0123" },
+      { id: "3", date: "02/14/2025", grossAmount: "$275.00", netAmount: "$275.00", price: "$27.1234", status: "Valid", type: "Purchase PAC", shareBalance: "6073.0123" },
+      { id: "4", date: "01/14/2025", grossAmount: "$3.60", netAmount: "$3.60", price: "$27.1234", status: "Valid", type: "Reinvested Distribution", shareBalance: "5972.0123" },
+      { id: "5", date: "12/14/2024", grossAmount: "$275.00", netAmount: "$275.00", price: "$27.1234", status: "Valid", type: "Purchase PAC", shareBalance: "5957.0123" },
+      { id: "6", date: "11/14/2024", grossAmount: "$3.05", netAmount: "$3.05", price: "$27.1234", status: "Valid", type: "Reinvested Distribution", shareBalance: "5856.0123" },
+      { id: "7", date: "10/14/2024", grossAmount: "$275.00", netAmount: "$275.00", price: "$27.1234", status: "Valid", type: "Purchase PAC", shareBalance: "5841.0123" },
+    ],
+    "FID-0000": [
+      { id: "1", date: "04/25/2025", grossAmount: "$1.05", netAmount: "$1.05", price: "$10.8765", status: "Valid", type: "Reinvested Distribution", shareBalance: "3976.5432" },
+      { id: "2", date: "03/25/2025", grossAmount: "$90.00", netAmount: "$90.00", price: "$10.8765", status: "Valid", type: "Purchase PAC", shareBalance: "3968.5432" },
+      { id: "3", date: "02/25/2025", grossAmount: "$90.00", netAmount: "$90.00", price: "$10.8765", status: "Valid", type: "Purchase PAC", shareBalance: "3884.5432" },
+      { id: "4", date: "01/25/2025", grossAmount: "$0.91", netAmount: "$0.91", price: "$10.8765", status: "Valid", type: "Reinvested Distribution", shareBalance: "3800.5432" },
+      { id: "5", date: "12/25/2024", grossAmount: "$90.00", netAmount: "$90.00", price: "$10.8765", status: "Valid", type: "Purchase PAC", shareBalance: "3792.5432" },
+      { id: "6", date: "11/25/2024", grossAmount: "$0.77", netAmount: "$0.77", price: "$10.8765", status: "Valid", type: "Reinvested Distribution", shareBalance: "3708.5432" },
+    ],
+    "SCOTIA-1111": [
+      { id: "1", date: "04/08/2025", grossAmount: "$3.85", netAmount: "$3.85", price: "$20.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "4354.3210" },
+      { id: "2", date: "03/08/2025", grossAmount: "$200.00", netAmount: "$200.00", price: "$20.5432", status: "Valid", type: "Purchase PAC", shareBalance: "4344.3210" },
+      { id: "3", date: "02/08/2025", grossAmount: "$200.00", netAmount: "$200.00", price: "$20.5432", status: "Valid", type: "Purchase PAC", shareBalance: "4244.3210" },
+      { id: "4", date: "01/08/2025", grossAmount: "$3.34", netAmount: "$3.34", price: "$20.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "4144.3210" },
+      { id: "5", date: "12/08/2024", grossAmount: "$200.00", netAmount: "$200.00", price: "$20.5432", status: "Valid", type: "Purchase PAC", shareBalance: "4131.3210" },
+      { id: "6", date: "11/08/2024", grossAmount: "$2.83", netAmount: "$2.83", price: "$20.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "4031.3210" },
+    ],
+    "MANULIFE-2222": [
+      { id: "1", date: "04/15/2025", grossAmount: "$1.25", netAmount: "$1.25", price: "$14.3210", status: "Valid", type: "Reinvested Distribution", shareBalance: "1978.9012" },
+      { id: "2", date: "03/15/2025", grossAmount: "$70.00", netAmount: "$70.00", price: "$14.3210", status: "Valid", type: "Purchase PAC", shareBalance: "1974.9012" },
+      { id: "3", date: "02/15/2025", grossAmount: "$70.00", netAmount: "$70.00", price: "$14.3210", status: "Valid", type: "Purchase PAC", shareBalance: "1929.9012" },
+      { id: "4", date: "01/15/2025", grossAmount: "$1.08", netAmount: "$1.08", price: "$14.3210", status: "Valid", type: "Reinvested Distribution", shareBalance: "1884.9012" },
+      { id: "5", date: "12/15/2024", grossAmount: "$70.00", netAmount: "$70.00", price: "$14.3210", status: "Valid", type: "Purchase PAC", shareBalance: "1877.9012" },
+      { id: "6", date: "11/15/2024", grossAmount: "$0.91", netAmount: "$0.91", price: "$14.3210", status: "Valid", type: "Reinvested Distribution", shareBalance: "1832.9012" },
+    ],
+    "SUNLIFE-3333": [
+      { id: "1", date: "04/22/2025", grossAmount: "$4.85", netAmount: "$4.85", price: "$32.1098", status: "Valid", type: "Reinvested Distribution", shareBalance: "6198.7654" },
+      { id: "2", date: "03/22/2025", grossAmount: "$350.00", netAmount: "$350.00", price: "$32.1098", status: "Valid", type: "Purchase PAC", shareBalance: "6184.7654" },
+      { id: "3", date: "02/22/2025", grossAmount: "$350.00", netAmount: "$350.00", price: "$32.1098", status: "Valid", type: "Purchase PAC", shareBalance: "6073.7654" },
+      { id: "4", date: "01/22/2025", grossAmount: "$4.21", netAmount: "$4.21", price: "$32.1098", status: "Valid", type: "Reinvested Distribution", shareBalance: "5962.7654" },
+      { id: "5", date: "12/22/2024", grossAmount: "$350.00", netAmount: "$350.00", price: "$32.1098", status: "Valid", type: "Purchase PAC", shareBalance: "5948.7654" },
+      { id: "6", date: "11/22/2024", grossAmount: "$3.57", netAmount: "$3.57", price: "$32.1098", status: "Valid", type: "Reinvested Distribution", shareBalance: "5837.7654" },
+      { id: "7", date: "10/22/2024", grossAmount: "$350.00", netAmount: "$350.00", price: "$32.1098", status: "Valid", type: "Purchase PAC", shareBalance: "5823.7654" },
+    ],
+    "IG-4444": [
+      { id: "1", date: "04/08/2025", grossAmount: "$2.25", netAmount: "$2.25", price: "$18.7654", status: "Valid", type: "Reinvested Distribution", shareBalance: "3621.0876" },
+      { id: "2", date: "03/08/2025", grossAmount: "$125.00", netAmount: "$125.00", price: "$18.7654", status: "Valid", type: "Purchase PAC", shareBalance: "3614.0876" },
+      { id: "3", date: "02/08/2025", grossAmount: "$125.00", netAmount: "$125.00", price: "$18.7654", status: "Valid", type: "Purchase PAC", shareBalance: "3548.0876" },
+      { id: "4", date: "01/08/2025", grossAmount: "$1.95", netAmount: "$1.95", price: "$18.7654", status: "Valid", type: "Reinvested Distribution", shareBalance: "3482.0876" },
+      { id: "5", date: "12/08/2024", grossAmount: "$125.00", netAmount: "$125.00", price: "$18.7654", status: "Valid", type: "Purchase PAC", shareBalance: "3475.0876" },
+      { id: "6", date: "11/08/2024", grossAmount: "$1.65", netAmount: "$1.65", price: "$18.7654", status: "Valid", type: "Reinvested Distribution", shareBalance: "3409.0876" },
     ],
   };
 
@@ -1973,11 +3277,6 @@ const ClientDetails = () => {
     }
     setExpandedPlans(newExpanded);
   };
-
-  // Count clients by status (for filters)
-  const activeCount = CLIENTS.filter((c) => c.status === "Active").length;
-  const inactiveCount = CLIENTS.filter((c) => c.status === "Inactive").length;
-  const prospectsCount = CLIENTS.filter((c) => c.status === "Prospect").length;
 
   return (
     <PageLayout title="">
@@ -4440,32 +5739,32 @@ const ClientDetails = () => {
                     <div className="space-y-2">
                       {filteredFundAccounts.length > 0 ? (
                         filteredFundAccounts.map((account) => (
-                          <div
-                            key={account.id}
-                            onClick={() => {
-                              setSelectedFundAccount(account.id);
-                              setSelectedTransaction(null); // Clear transaction selection to show fund account details
-                            }}
-                            className={`border rounded p-2 cursor-pointer transition-colors ${
-                              selectedFundAccount === account.id
-                                ? "border-blue-500 bg-blue-50"
-                                : "border-gray-200 hover:bg-gray-50"
-                            }`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-medium text-gray-900 truncate">{account.fullName}</p>
-                              </div>
-                              <div className="flex items-center gap-2 ml-2">
-                                <span className="text-xs font-semibold text-gray-900">{account.marketValue}</span>
-                                <div className="flex items-center gap-1">
-                                  <BarChart3 className="h-3 w-3 text-gray-500" />
-                                  <FileText className="h-3 w-3 text-gray-500" />
-                                  <HelpCircle className="h-3 w-3 text-gray-500" />
-                                </div>
+                        <div
+                          key={account.id}
+                          onClick={() => {
+                            setSelectedFundAccount(account.id);
+                            setSelectedTransaction(null); // Clear transaction selection to show fund account details
+                          }}
+                          className={`border rounded p-2 cursor-pointer transition-colors ${
+                            selectedFundAccount === account.id
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200 hover:bg-gray-50"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium text-gray-900 truncate">{account.fullName}</p>
+                            </div>
+                            <div className="flex items-center gap-2 ml-2">
+                              <span className="text-xs font-semibold text-gray-900">{account.marketValue}</span>
+                              <div className="flex items-center gap-1">
+                                <BarChart3 className="h-3 w-3 text-gray-500" />
+                                <FileText className="h-3 w-3 text-gray-500" />
+                                <HelpCircle className="h-3 w-3 text-gray-500" />
                               </div>
                             </div>
                           </div>
+                        </div>
                         ))
                       ) : (
                         <div className="text-center py-4 text-xs text-gray-500">
@@ -4490,45 +5789,41 @@ const ClientDetails = () => {
                   {selectedFundAccount ? (
                     <div className="space-y-3">
                       {/* Filter Dropdowns */}
-                      <div className="space-y-2">
-                        <div>
-                          <Label className="text-[10px] text-gray-500 mb-0.5 block">Display Option:</Label>
+                      <div className="flex items-end gap-3">
+                        <div className="flex-1">
+                          <Label className="text-[10px] text-gray-500 mb-0.5 block">Display Options</Label>
                           <Select value={transactionsDisplayOption} onValueChange={setTransactionsDisplayOption}>
                             <SelectTrigger className="h-7 text-[11px]">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
+                              <SelectItem value="All">All</SelectItem>
                               <SelectItem value="Valid and Pending">Valid and Pending</SelectItem>
-                              <SelectItem value="Valid Only">Valid Only</SelectItem>
-                              <SelectItem value="Pending Only">Pending Only</SelectItem>
+                              <SelectItem value="Valid and Manual">Valid and Manual</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
-                        <div>
-                          <Label className="text-[10px] text-gray-500 mb-0.5 block">Sort by Trade Date</Label>
+                        <div className="flex-1">
+                          <Label className="text-[10px] text-gray-500 mb-0.5 block">Trade Date</Label>
                           <Select value={transactionsSortBy} onValueChange={setTransactionsSortBy}>
                             <SelectTrigger className="h-7 text-[11px]">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Trade Date">Trade Date</SelectItem>
-                              <SelectItem value="Amount">Amount</SelectItem>
-                              <SelectItem value="Type">Type</SelectItem>
+                              <SelectItem value="Sort by Trade Date">Sort by Trade Date</SelectItem>
+                              <SelectItem value="Sort by Processing Date">Sort by Processing Date</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <Label className="text-[10px] text-gray-500 mb-0.5 block">Selected Account</Label>
-                          <Select defaultValue={selectedFundAccount}>
+                          <Select value={selectedAccountFilter} onValueChange={setSelectedAccountFilter}>
                             <SelectTrigger className="h-7 text-[11px]">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {filteredFundAccounts.map((account) => (
-                                <SelectItem key={account.id} value={account.id}>
-                                  {account.id}
-                                </SelectItem>
-                              ))}
+                              <SelectItem value="Selected Account">Selected Account</SelectItem>
+                              <SelectItem value="Selected Plan">Selected Plan</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -6026,57 +7321,66 @@ const ClientDetails = () => {
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Type</Label>
-                                  <Select defaultValue={selectedPlanData.type.toLowerCase()}>
+                                  <Select value={selectedPlanData?.type?.toLowerCase() || ""}>
                                     <SelectTrigger className="h-7 text-[11px]">
-                                      <SelectValue />
+                                      <SelectValue>
+                                        {selectedPlanData?.type || "Select type"}
+                                      </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
+                                      <SelectItem value="open">OPEN</SelectItem>
                                       <SelectItem value="rrsp">RRSP</SelectItem>
                                       <SelectItem value="tfsa">TFSA</SelectItem>
                                       <SelectItem value="resp">RESP</SelectItem>
                                       <SelectItem value="rrif">RRIF</SelectItem>
+                                      <SelectItem value="lif">LIF</SelectItem>
+                                      <SelectItem value="non-registered">Non-Registered</SelectItem>
+                                      <SelectItem value="dcpp">DCPP</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Account Designation</Label>
-                                  <Select defaultValue="client-name">
+                                  <Select value={planDetails.accountDesignation === "Joint" ? "joint" : planDetails.accountDesignation === "Individual" ? "individual" : "client-name"}>
                                     <SelectTrigger className="h-7 text-[11px]">
-                                      <SelectValue />
+                                      <SelectValue>
+                                        {planDetails.accountDesignation || "Client Name"}
+                                      </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="client-name">Client Name</SelectItem>
+                                      <SelectItem value="individual">Individual</SelectItem>
                                       <SelectItem value="joint">Joint</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Current Representative</Label>
-                                  <p className="text-[11px] text-blue-600 underline cursor-pointer">9823-2232 Marsh, Antoine</p>
+                                  <p className="text-[11px] text-blue-600 underline cursor-pointer">{clientDetails.representative.id} {clientDetails.representative.name}</p>
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Description</Label>
-                                  <Input className="h-7 text-[11px]" />
+                                  <Input className="h-7 text-[11px]" value={planDetails.description || ""} placeholder="Enter description" />
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Intent Of Use</Label>
-                                  <Input className="h-7 text-[11px]" />
+                                  <Input className="h-7 text-[11px]" value={planDetails.intentOfUse || ""} placeholder="Enter intent of use" />
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                  <Checkbox id="frozen" defaultChecked className="h-3 w-3" />
+                                  <Checkbox id="frozen" defaultChecked={planDetails.frozen} className="h-3 w-3" />
                                   <Label htmlFor="frozen" className="text-[10px] text-gray-700 cursor-pointer">Frozen</Label>
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                  <Checkbox id="full-freeze" className="h-3 w-3" />
+                                  <Checkbox id="full-freeze" defaultChecked={planDetails.fullFreeze} className="h-3 w-3" />
                                   <Label htmlFor="full-freeze" className="text-[10px] text-gray-700 cursor-pointer">Full Freeze</Label>
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                  <Checkbox id="group-account" className="h-3 w-3" />
+                                  <Checkbox id="group-account" defaultChecked={planDetails.groupAccount} className="h-3 w-3" />
                                   <Label htmlFor="group-account" className="text-[10px] text-gray-700 cursor-pointer">Group Account</Label>
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Group Account ID</Label>
-                                  <Select>
+                                  <Select defaultValue={planDetails.groupAccountId || "none"}>
                                     <SelectTrigger className="h-7 text-[11px]">
                                       <SelectValue placeholder="Select" />
                                     </SelectTrigger>
@@ -6086,20 +7390,20 @@ const ClientDetails = () => {
                                   </Select>
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                  <Checkbox id="leveraged" className="h-3 w-3" />
+                                  <Checkbox id="leveraged" defaultChecked={planDetails.leveraged} className="h-3 w-3" />
                                   <Label htmlFor="leveraged" className="text-[10px] text-gray-700 cursor-pointer">Leveraged</Label>
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Loan Number</Label>
-                                  <Input className="h-7 text-[11px]" />
+                                  <Input className="h-7 text-[11px]" defaultValue={planDetails.loanNumber} />
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                  <Checkbox id="locked-in" className="h-3 w-3" />
+                                  <Checkbox id="locked-in" defaultChecked={planDetails.lockedIn} className="h-3 w-3" />
                                   <Label htmlFor="locked-in" className="text-[10px] text-gray-700 cursor-pointer">Locked In</Label>
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Recipient</Label>
-                                  <Select defaultValue="individual">
+                                  <Select defaultValue={planDetails.recipient.toLowerCase()}>
                                     <SelectTrigger className="h-7 text-[11px]">
                                       <SelectValue />
                                     </SelectTrigger>
@@ -6111,11 +7415,11 @@ const ClientDetails = () => {
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Intermediary Code</Label>
-                                  <Input className="h-7 text-[11px]" />
+                                  <Input className="h-7 text-[11px]" value={planDetails.intermediaryCode || ""} key={selectedPlanForDetails} readOnly />
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Intermediary Account Code</Label>
-                                  <Input className="h-7 text-[11px]" defaultValue="5662474830" readOnly />
+                                  <Input className="h-7 text-[11px]" value={planDetails.intermediaryAccountCode || ""} key={selectedPlanForDetails} readOnly />
                                 </div>
                               </div>
                             </div>
@@ -6147,38 +7451,38 @@ const ClientDetails = () => {
                           {/* Right Column */}
                           <div className="space-y-3">
                             {/* Important Dates */}
-                            <div className="bg-white p-3 rounded border border-gray-200">
+                            <div className="bg-white p-3 rounded border border-gray-200" key={`important-dates-${id}-${selectedPlanForDetails}`}>
                               <h3 className="text-xs font-semibold text-gray-900 mb-2 pb-1 border-b-2 border-blue-600">Important Dates</h3>
                               <div className="grid grid-cols-2 gap-2">
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Start Date</Label>
                                   <div className="flex items-center gap-1.5">
-                                    <Input className="h-7 text-[11px]" defaultValue="05/21/2008" />
+                                    <Input className="h-7 text-[11px]" value={planDetails.startDate || ""} readOnly />
                                     <Calendar className="h-3 w-3 text-gray-500" />
                                   </div>
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">End Date</Label>
                                   <div className="flex items-center gap-1.5">
-                                    <Input className="h-7 text-[11px]" />
+                                    <Input className="h-7 text-[11px]" value={planDetails.endDate || ""} readOnly />
                                     <Calendar className="h-3 w-3 text-gray-500" />
                                   </div>
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">KYC On File Date</Label>
                                   <div className="flex items-center gap-1.5">
-                                    <Input className="h-7 text-[11px]" defaultValue="03/13/2007" />
+                                    <Input className="h-7 text-[11px]" value={planDetails.kycOnFileDate || ""} readOnly />
                                     <Calendar className="h-3 w-3 text-gray-500" />
                                   </div>
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">KYC Age</Label>
-                                  <Input className="h-7 text-[11px]" defaultValue="6852 days Old" readOnly />
+                                  <Input className="h-7 text-[11px]" value={planDetails.kycAge || ""} readOnly />
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">KYC Original Received Date</Label>
                                   <div className="flex items-center gap-1.5">
-                                    <Input className="h-7 text-[11px]" />
+                                    <Input className="h-7 text-[11px]" value={planDetails.kycOriginalReceivedDate || ""} readOnly />
                                     <Calendar className="h-3 w-3 text-gray-500" />
                                   </div>
                                 </div>
@@ -6191,7 +7495,7 @@ const ClientDetails = () => {
                               <div className="grid grid-cols-2 gap-2">
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Revenue Model</Label>
-                                  <Select defaultValue="commissions">
+                                  <Select defaultValue={planDetails.revenueModel.toLowerCase().replace(" ", "-")}>
                                     <SelectTrigger className="h-7 text-[11px]">
                                       <SelectValue />
                                     </SelectTrigger>
@@ -6203,17 +7507,17 @@ const ClientDetails = () => {
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Fee for Service Amount</Label>
-                                  <Input className="h-7 text-[11px]" />
+                                  <Input className="h-7 text-[11px]" defaultValue={planDetails.feeForServiceAmount} />
                                 </div>
                                 <div>
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Fee for Service Start Date</Label>
                                   <div className="flex items-center gap-1.5">
-                                    <Input className="h-7 text-[11px]" />
+                                    <Input className="h-7 text-[11px]" defaultValue={planDetails.feeForServiceStartDate} />
                                     <Calendar className="h-3 w-3 text-gray-500" />
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-1.5 pt-4">
-                                  <Checkbox id="ffs-approved" className="h-3 w-3" />
+                                  <Checkbox id="ffs-approved" defaultChecked={planDetails.feeForServiceApproved} className="h-3 w-3" />
                                   <Label htmlFor="ffs-approved" className="text-[10px] text-gray-700 cursor-pointer">Fee for Service Approved</Label>
                                 </div>
                               </div>
