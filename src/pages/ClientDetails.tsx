@@ -2366,6 +2366,85 @@ const ClientDetails = () => {
   const getFundAccountById = (fundId: string) => {
     return fundAccounts.find(f => f.id === fundId);
   };
+
+  // Generate unique calculator values based on client ID and fund account ID
+  const getFundAccountCalculatorValues = (clientId: string | undefined, fundAccountId: string | null) => {
+    if (!fundAccountId) {
+      return {
+        currentMarketValue: "$0.00",
+        currentShareBalance: "0.0000",
+        adjustedCostBase: "$0.00",
+        rateOfReturn: "0.00000 %",
+        historicalMarketValue: "$0.00",
+        historicalShareBalance: "0.0000",
+        historicalTargetDate: "12/19/2025",
+        rateOfReturnStartDate: "12/19/2025",
+        rateOfReturnEndDate: "12/19/2025",
+      };
+    }
+
+    // Create a hash from client ID and fund account ID for consistent but unique values
+    const clientHash = (clientId || "").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const fundHash = fundAccountId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const hash = clientHash + fundHash;
+
+    // Generate unique market value (between $50 and $50,000)
+    const marketValueBase = 50 + (hash % 4950);
+    const marketValueCents = (hash * 7) % 100;
+    const currentMarketValue = `$${marketValueBase.toFixed(2)}`;
+
+    // Generate unique share balance (between 0.1 and 1000)
+    const shareBalanceBase = 0.1 + ((hash * 13) % 999.9);
+    const currentShareBalance = shareBalanceBase.toFixed(4);
+
+    // Generate adjusted cost base (slightly less than market value for gain)
+    const costBaseMultiplier = 0.85 + ((hash * 11) % 15) / 100; // 0.85 to 0.99
+    const adjustedCostBase = `$${(marketValueBase * costBaseMultiplier).toFixed(2)}`;
+
+    // Generate rate of return (between -5% and 25%)
+    const rateOfReturnValue = -5 + ((hash * 17) % 30);
+    const rateOfReturn = `${rateOfReturnValue >= 0 ? '+' : ''}${rateOfReturnValue.toFixed(5)} %`;
+
+    // Generate historical values (slightly different from current)
+    const historicalMultiplier = 0.9 + ((hash * 19) % 20) / 100; // 0.9 to 1.09
+    const historicalMarketValue = `$${(marketValueBase * historicalMultiplier).toFixed(2)}`;
+    const historicalShareBalance = (shareBalanceBase * historicalMultiplier).toFixed(4);
+
+    // Generate unique dates based on hash
+    const year = 2020 + ((hash * 7) % 6); // 2020-2025
+    const month = 1 + ((hash * 11) % 12); // 1-12
+    const day = 1 + ((hash * 13) % 28); // 1-28
+    const historicalTargetDate = `${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}/${year}`;
+
+    // Rate of return dates (start date earlier than end date)
+    const startYear = 2019 + ((hash * 5) % 4); // 2019-2022
+    const startMonth = 1 + ((hash * 3) % 12);
+    const startDay = 1 + ((hash * 7) % 28);
+    const rateOfReturnStartDate = `${String(startMonth).padStart(2, '0')}/${String(startDay).padStart(2, '0')}/${startYear}`;
+    
+    const endYear = startYear + 1 + ((hash * 2) % 3); // 1-3 years after start
+    const endMonth = 1 + ((hash * 5) % 12);
+    const endDay = 1 + ((hash * 9) % 28);
+    const rateOfReturnEndDate = `${String(endMonth).padStart(2, '0')}/${String(endDay).padStart(2, '0')}/${endYear}`;
+
+    return {
+      currentMarketValue,
+      currentShareBalance,
+      adjustedCostBase,
+      rateOfReturn,
+      historicalMarketValue,
+      historicalShareBalance,
+      historicalTargetDate,
+      rateOfReturnStartDate,
+      rateOfReturnEndDate,
+    };
+  };
+
+  // Get calculator values for selected fund account
+  const calculatorValues = useMemo(() => 
+    getFundAccountCalculatorValues(id, selectedFundAccount), 
+    [id, selectedFundAccount]
+  );
   
   // Helper function to calculate total market value for a plan
   const getPlanTotalValue = (planInvestments: string[]) => {
@@ -6553,22 +6632,22 @@ const ClientDetails = () => {
                         </div>
                       </TabsContent>
                       
-                      <TabsContent value="tools" className="mt-4">
+                      <TabsContent value="tools" className="mt-4" key={`tools-${id}-${selectedFundAccount}`}>
                         <div className="space-y-4">
                           {/* Market Value Calculator */}
                           <div className="bg-blue-50 rounded border border-blue-200">
                             <div className="bg-blue-600 text-white px-3 py-2 rounded-t">
                               <h3 className="text-xs font-semibold">Market Value Calculator</h3>
                             </div>
-                            <div className="p-3 space-y-3">
+                            <div className="p-3 space-y-3" key={`market-value-${id}-${selectedFundAccount}`}>
                               <div>
                                 <Label className="text-[10px] text-gray-500 mb-0.5 block">Current Market Value</Label>
-                                <Input className="h-7 text-[11px]" value="$148.94" readOnly />
+                                <Input className="h-7 text-[11px]" value={calculatorValues.currentMarketValue} readOnly />
                               </div>
                               <div>
                                 <Label className="text-[10px] text-gray-500 mb-0.5 block">Historical Market Value Target Date</Label>
                                 <div className="flex items-center gap-2">
-                                  <Input className="h-7 text-[11px]" value="12/19/2025" />
+                                  <Input className="h-7 text-[11px]" value={calculatorValues.historicalTargetDate} readOnly />
                                   <Calendar className="h-4 w-4 text-gray-500" />
                                 </div>
                               </div>
@@ -6578,7 +6657,7 @@ const ClientDetails = () => {
                                 </Button>
                                 <div className="flex-1">
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">CAD</Label>
-                                  <Input className="h-7 text-[11px]" value="$0.00" readOnly />
+                                  <Input className="h-7 text-[11px]" value={calculatorValues.historicalMarketValue} readOnly />
                                 </div>
                               </div>
                             </div>
@@ -6589,15 +6668,15 @@ const ClientDetails = () => {
                             <div className="bg-blue-600 text-white px-3 py-2 rounded-t">
                               <h3 className="text-xs font-semibold">Share Balance Calculator</h3>
                             </div>
-                            <div className="p-3 space-y-3">
+                            <div className="p-3 space-y-3" key={`share-balance-${id}-${selectedFundAccount}`}>
                               <div>
                                 <Label className="text-[10px] text-gray-500 mb-0.5 block">Current Share Balance</Label>
-                                <Input className="h-7 text-[11px]" value="4.6920" readOnly />
+                                <Input className="h-7 text-[11px]" value={calculatorValues.currentShareBalance} readOnly />
                               </div>
                               <div>
                                 <Label className="text-[10px] text-gray-500 mb-0.5 block">Historical Share Balance Target Date</Label>
                                 <div className="flex items-center gap-2">
-                                  <Input className="h-7 text-[11px]" value="12/19/2025" />
+                                  <Input className="h-7 text-[11px]" value={calculatorValues.historicalTargetDate} readOnly />
                                   <Calendar className="h-4 w-4 text-gray-500" />
                                 </div>
                               </div>
@@ -6607,7 +6686,7 @@ const ClientDetails = () => {
                                 </Button>
                                 <div className="flex-1">
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">Historical Share Balance</Label>
-                                  <Input className="h-7 text-[11px]" value="0.0000" readOnly />
+                                  <Input className="h-7 text-[11px]" value={calculatorValues.historicalShareBalance} readOnly />
                                 </div>
                               </div>
                             </div>
@@ -6618,13 +6697,13 @@ const ClientDetails = () => {
                             <div className="bg-blue-600 text-white px-3 py-2 rounded-t">
                               <h3 className="text-xs font-semibold">Adjusted Cost Base (Book Value) Calculator</h3>
                             </div>
-                            <div className="p-3">
+                            <div className="p-3" key={`cost-base-${id}-${selectedFundAccount}`}>
                               <div className="flex items-center gap-2">
                                 <Button size="sm" className="h-7 text-[10px] bg-blue-600 hover:bg-blue-700 text-white">
                                   Adjusted Cost Base
                                 </Button>
                                 <div className="flex-1">
-                                  <Input className="h-7 text-[11px]" value="$0.00" readOnly />
+                                  <Input className="h-7 text-[11px]" value={calculatorValues.adjustedCostBase} readOnly />
                                 </div>
                               </div>
                             </div>
@@ -6635,7 +6714,7 @@ const ClientDetails = () => {
                             <div className="bg-blue-600 text-white px-3 py-2 rounded-t">
                               <h3 className="text-xs font-semibold">Rate Of Return Calculator</h3>
                             </div>
-                            <div className="p-3 space-y-3">
+                            <div className="p-3 space-y-3" key={`rate-return-${id}-${selectedFundAccount}`}>
                               <div className="flex items-center gap-2">
                                 <Checkbox id="since-inception" />
                                 <Label htmlFor="since-inception" className="text-[10px] text-gray-500 cursor-pointer">Since Inception</Label>
@@ -6643,14 +6722,14 @@ const ClientDetails = () => {
                               <div>
                                 <Label className="text-[10px] text-gray-500 mb-0.5 block">Rate of Return Start Date</Label>
                                 <div className="flex items-center gap-2">
-                                  <Input className="h-7 text-[11px]" value="12/19/2025" />
+                                  <Input className="h-7 text-[11px]" value={calculatorValues.rateOfReturnStartDate} readOnly />
                                   <Calendar className="h-4 w-4 text-gray-500" />
                                 </div>
                               </div>
                               <div>
                                 <Label className="text-[10px] text-gray-500 mb-0.5 block">Rate of Return End Date</Label>
                                 <div className="flex items-center gap-2">
-                                  <Input className="h-7 text-[11px]" value="12/19/2025" />
+                                  <Input className="h-7 text-[11px]" value={calculatorValues.rateOfReturnEndDate} readOnly />
                                   <Calendar className="h-4 w-4 text-gray-500" />
                                 </div>
                               </div>
@@ -6660,7 +6739,7 @@ const ClientDetails = () => {
                                 </Button>
                                 <div className="flex-1">
                                   <Label className="text-[10px] text-gray-500 mb-0.5 block">XIRR Rate of Return</Label>
-                                  <Input className="h-7 text-[11px]" value="0.00000 %" readOnly />
+                                  <Input className="h-7 text-[11px]" value={calculatorValues.rateOfReturn} readOnly />
                                 </div>
                               </div>
                             </div>
