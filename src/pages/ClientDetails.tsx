@@ -1136,6 +1136,13 @@ const ClientDetails = () => {
   const plansList = clientData.plans;
   const fundAccounts = clientData.fundAccounts;
   
+  // Get investments for selected plan
+  const getPlanInvestments = (planId: string | null): string[] => {
+    if (!planId) return [];
+    const planData = Object.values(clientData.summaryData).find((p: any) => p.id === planId);
+    return planData?.investments || [];
+  };
+  
   // Set default selected plan on mount or when client changes
   useEffect(() => {
     if (plansList.length > 0) {
@@ -1147,8 +1154,25 @@ const ClientDetails = () => {
     }
   }, [id]);
   
+  // Clear selected fund account if it doesn't belong to the selected plan
+  useEffect(() => {
+    if (selectedPlanForDetails && selectedFundAccount) {
+      const planInvestments = getPlanInvestments(selectedPlanForDetails);
+      if (!planInvestments.includes(selectedFundAccount)) {
+        setSelectedFundAccount(null);
+        setSelectedTransaction(null);
+      }
+    }
+  }, [selectedPlanForDetails]);
+  
   // Get selected plan data for details
   const selectedPlanData = plansList.find(p => p.id === selectedPlanForDetails) || (plansList.length > 0 ? plansList[0] : null);
+  
+  // Get fund accounts for selected plan only
+  const planInvestments = getPlanInvestments(selectedPlanForDetails);
+  const filteredFundAccounts = selectedPlanForDetails 
+    ? fundAccounts.filter(account => planInvestments.includes(account.id))
+    : fundAccounts;
   
   // Get selected fund account data
   const selectedFundAccountData = fundAccounts.find(f => f.id === selectedFundAccount) || null;
@@ -1170,17 +1194,109 @@ const ClientDetails = () => {
     }, 0);
   };
   
-  // Transaction data for selected fund account
-  const transactions = selectedFundAccount ? [
-    { id: "1", date: "04/25/2025", grossAmount: "$0.82", netAmount: "$0.82", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "11.8280" },
-    { id: "2", date: "02/21/2025", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "10.8280" },
-    { id: "3", date: "01/21/2025", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "8.8280" },
-    { id: "4", date: "12/20/2024", grossAmount: "$0.69", netAmount: "$0.69", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "6.8280" },
-    { id: "5", date: "11/20/2024", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "4.8280" },
-    { id: "6", date: "10/20/2024", grossAmount: "$0.56", netAmount: "$0.56", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "2.8280" },
-    { id: "7", date: "09/20/2024", grossAmount: "$0.42", netAmount: "$0.42", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "0.8280" },
-    { id: "8", date: "08/20/2024", grossAmount: "$0.27", netAmount: "$0.27", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "0.0000" },
-  ] : [];
+  // Transaction data map for each fund account
+  const transactionsMap: Record<string, Array<{
+    id: string;
+    date: string;
+    grossAmount: string;
+    netAmount: string;
+    price: string;
+    status: string;
+    type: string;
+    shareBalance: string;
+  }>> = {
+    "MFC-724": [
+      { id: "1", date: "04/25/2025", grossAmount: "$0.82", netAmount: "$0.82", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "11.8280" },
+      { id: "2", date: "02/21/2025", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "10.8280" },
+      { id: "3", date: "01/21/2025", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "8.8280" },
+      { id: "4", date: "12/20/2024", grossAmount: "$0.69", netAmount: "$0.69", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "6.8280" },
+      { id: "5", date: "11/20/2024", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "4.8280" },
+      { id: "6", date: "10/20/2024", grossAmount: "$0.56", netAmount: "$0.56", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "2.8280" },
+      { id: "7", date: "09/20/2024", grossAmount: "$0.42", netAmount: "$0.42", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "0.8280" },
+      { id: "8", date: "08/20/2024", grossAmount: "$0.27", netAmount: "$0.27", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "0.0000" },
+    ],
+    "MFC-2238": [
+      { id: "1", date: "04/22/2025", grossAmount: "$1.15", netAmount: "$1.15", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "15.2340" },
+      { id: "2", date: "03/15/2025", grossAmount: "$50.00", netAmount: "$50.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "14.2340" },
+      { id: "3", date: "02/15/2025", grossAmount: "$50.00", netAmount: "$50.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "10.2340" },
+      { id: "4", date: "01/15/2025", grossAmount: "$0.95", netAmount: "$0.95", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "6.2340" },
+      { id: "5", date: "12/15/2024", grossAmount: "$50.00", netAmount: "$50.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "5.2340" },
+      { id: "6", date: "11/15/2024", grossAmount: "$0.78", netAmount: "$0.78", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "1.2340" },
+    ],
+    "TD-1234": [
+      { id: "1", date: "04/28/2025", grossAmount: "$2.45", netAmount: "$2.45", price: "$28.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "3245.6780" },
+      { id: "2", date: "03/25/2025", grossAmount: "$100.00", netAmount: "$100.00", price: "$28.5432", status: "Valid", type: "Purchase PAC", shareBalance: "3241.6780" },
+      { id: "3", date: "02/25/2025", grossAmount: "$100.00", netAmount: "$100.00", price: "$28.5432", status: "Valid", type: "Purchase PAC", shareBalance: "3197.6780" },
+      { id: "4", date: "01/25/2025", grossAmount: "$2.12", netAmount: "$2.12", price: "$28.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "3161.6780" },
+      { id: "5", date: "12/25/2024", grossAmount: "$100.00", netAmount: "$100.00", price: "$28.5432", status: "Valid", type: "Purchase PAC", shareBalance: "3153.6780" },
+      { id: "6", date: "11/25/2024", grossAmount: "$1.89", netAmount: "$1.89", price: "$28.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "3117.6780" },
+      { id: "7", date: "10/25/2024", grossAmount: "$1.65", netAmount: "$1.65", price: "$28.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "3081.6780" },
+    ],
+    "RBC-5678": [
+      { id: "1", date: "04/27/2025", grossAmount: "$1.32", netAmount: "$1.32", price: "$15.2345", status: "Valid", type: "Reinvested Distribution", shareBalance: "2987.6540" },
+      { id: "2", date: "03/20/2025", grossAmount: "$75.00", netAmount: "$75.00", price: "$15.2345", status: "Valid", type: "Purchase PAC", shareBalance: "2982.6540" },
+      { id: "3", date: "02/20/2025", grossAmount: "$75.00", netAmount: "$75.00", price: "$15.2345", status: "Valid", type: "Purchase PAC", shareBalance: "2932.6540" },
+      { id: "4", date: "01/20/2025", grossAmount: "$1.18", netAmount: "$1.18", price: "$15.2345", status: "Valid", type: "Reinvested Distribution", shareBalance: "2882.6540" },
+      { id: "5", date: "12/20/2024", grossAmount: "$75.00", netAmount: "$75.00", price: "$15.2345", status: "Valid", type: "Purchase PAC", shareBalance: "2875.6540" },
+      { id: "6", date: "11/20/2024", grossAmount: "$1.05", netAmount: "$1.05", price: "$15.2345", status: "Valid", type: "Reinvested Distribution", shareBalance: "2825.6540" },
+    ],
+    "BMO-9012": [
+      { id: "1", date: "04/26/2025", grossAmount: "$1.78", netAmount: "$1.78", price: "$22.6789", status: "Valid", type: "Reinvested Distribution", shareBalance: "1434.5670" },
+      { id: "2", date: "03/18/2025", grossAmount: "$150.00", netAmount: "$150.00", price: "$22.6789", status: "Valid", type: "Purchase PAC", shareBalance: "1427.5670" },
+      { id: "3", date: "02/18/2025", grossAmount: "$150.00", netAmount: "$150.00", price: "$22.6789", status: "Valid", type: "Purchase PAC", shareBalance: "1360.5670" },
+      { id: "4", date: "01/18/2025", grossAmount: "$1.54", netAmount: "$1.54", price: "$22.6789", status: "Valid", type: "Reinvested Distribution", shareBalance: "1293.5670" },
+      { id: "5", date: "12/18/2024", grossAmount: "$150.00", netAmount: "$150.00", price: "$22.6789", status: "Valid", type: "Purchase PAC", shareBalance: "1286.5670" },
+      { id: "6", date: "11/18/2024", grossAmount: "$1.31", netAmount: "$1.31", price: "$22.6789", status: "Valid", type: "Reinvested Distribution", shareBalance: "1219.5670" },
+    ],
+    "CIBC-2468": [
+      { id: "1", date: "04/24/2025", grossAmount: "$1.92", netAmount: "$1.92", price: "$19.8765", status: "Valid", type: "Reinvested Distribution", shareBalance: "3416.7890" },
+      { id: "2", date: "03/22/2025", grossAmount: "$200.00", netAmount: "$200.00", price: "$19.8765", status: "Valid", type: "Purchase PAC", shareBalance: "3406.7890" },
+      { id: "3", date: "02/22/2025", grossAmount: "$200.00", netAmount: "$200.00", price: "$19.8765", status: "Valid", type: "Purchase PAC", shareBalance: "3306.7890" },
+      { id: "4", date: "01/22/2025", grossAmount: "$1.67", netAmount: "$1.67", price: "$19.8765", status: "Valid", type: "Reinvested Distribution", shareBalance: "3206.7890" },
+      { id: "5", date: "12/22/2024", grossAmount: "$200.00", netAmount: "$200.00", price: "$19.8765", status: "Valid", type: "Purchase PAC", shareBalance: "3196.7890" },
+      { id: "6", date: "11/22/2024", grossAmount: "$1.42", netAmount: "$1.42", price: "$19.8765", status: "Valid", type: "Reinvested Distribution", shareBalance: "3096.7890" },
+      { id: "7", date: "10/22/2024", grossAmount: "$1.18", netAmount: "$1.18", price: "$19.8765", status: "Valid", type: "Reinvested Distribution", shareBalance: "2996.7890" },
+    ],
+    "FID-1357": [
+      { id: "1", date: "04/23/2025", grossAmount: "$2.18", netAmount: "$2.18", price: "$24.5678", status: "Valid", type: "Reinvested Distribution", shareBalance: "1836.4520" },
+      { id: "2", date: "03/19/2025", grossAmount: "$125.00", netAmount: "$125.00", price: "$24.5678", status: "Valid", type: "Purchase PAC", shareBalance: "1831.4520" },
+      { id: "3", date: "02/19/2025", grossAmount: "$125.00", netAmount: "$125.00", price: "$24.5678", status: "Valid", type: "Purchase PAC", shareBalance: "1781.4520" },
+      { id: "4", date: "01/19/2025", grossAmount: "$1.89", netAmount: "$1.89", price: "$24.5678", status: "Valid", type: "Reinvested Distribution", shareBalance: "1731.4520" },
+      { id: "5", date: "12/19/2024", grossAmount: "$125.00", netAmount: "$125.00", price: "$24.5678", status: "Valid", type: "Purchase PAC", shareBalance: "1726.4520" },
+      { id: "6", date: "11/19/2024", grossAmount: "$1.61", netAmount: "$1.61", price: "$24.5678", status: "Valid", type: "Reinvested Distribution", shareBalance: "1676.4520" },
+    ],
+    "SCOTIA-9876": [
+      { id: "1", date: "04/21/2025", grossAmount: "$0.95", netAmount: "$0.95", price: "$11.2345", status: "Valid", type: "Reinvested Distribution", shareBalance: "1643.7890" },
+      { id: "2", date: "03/17/2025", grossAmount: "$60.00", netAmount: "$60.00", price: "$11.2345", status: "Valid", type: "Purchase PAC", shareBalance: "1638.7890" },
+      { id: "3", date: "02/17/2025", grossAmount: "$60.00", netAmount: "$60.00", price: "$11.2345", status: "Valid", type: "Purchase PAC", shareBalance: "1583.7890" },
+      { id: "4", date: "01/17/2025", grossAmount: "$0.82", netAmount: "$0.82", price: "$11.2345", status: "Valid", type: "Reinvested Distribution", shareBalance: "1528.7890" },
+      { id: "5", date: "12/17/2024", grossAmount: "$60.00", netAmount: "$60.00", price: "$11.2345", status: "Valid", type: "Purchase PAC", shareBalance: "1521.7890" },
+      { id: "6", date: "11/17/2024", grossAmount: "$0.69", netAmount: "$0.69", price: "$11.2345", status: "Valid", type: "Reinvested Distribution", shareBalance: "1466.7890" },
+    ],
+    "AGF-185": [
+      { id: "1", date: "04/20/2025", grossAmount: "$0.00", netAmount: "$0.00", price: "$0.00", status: "Valid", type: "Reinvested Distribution", shareBalance: "0.0000" },
+    ],
+    "TD-0000": [
+      { id: "1", date: "04/29/2025", grossAmount: "$3.25", netAmount: "$3.25", price: "$19.8765", status: "Valid", type: "Reinvested Distribution", shareBalance: "6768.9012" },
+      { id: "2", date: "03/28/2025", grossAmount: "$250.00", netAmount: "$250.00", price: "$19.8765", status: "Valid", type: "Purchase PAC", shareBalance: "6753.9012" },
+      { id: "3", date: "02/28/2025", grossAmount: "$250.00", netAmount: "$250.00", price: "$19.8765", status: "Valid", type: "Purchase PAC", shareBalance: "6541.9012" },
+      { id: "4", date: "01/28/2025", grossAmount: "$2.82", netAmount: "$2.82", price: "$19.8765", status: "Valid", type: "Reinvested Distribution", shareBalance: "6329.9012" },
+      { id: "5", date: "12/28/2024", grossAmount: "$250.00", netAmount: "$250.00", price: "$19.8765", status: "Valid", type: "Purchase PAC", shareBalance: "6314.9012" },
+      { id: "6", date: "11/28/2024", grossAmount: "$2.39", netAmount: "$2.39", price: "$19.8765", status: "Valid", type: "Reinvested Distribution", shareBalance: "6102.9012" },
+      { id: "7", date: "10/28/2024", grossAmount: "$1.96", netAmount: "$1.96", price: "$19.8765", status: "Valid", type: "Reinvested Distribution", shareBalance: "5889.9012" },
+    ],
+    "RBC-1111": [
+      { id: "1", date: "04/30/2025", grossAmount: "$1.45", netAmount: "$1.45", price: "$13.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "5005.6789" },
+      { id: "2", date: "03/30/2025", grossAmount: "$180.00", netAmount: "$180.00", price: "$13.5432", status: "Valid", type: "Purchase PAC", shareBalance: "4992.6789" },
+      { id: "3", date: "02/28/2025", grossAmount: "$180.00", netAmount: "$180.00", price: "$13.5432", status: "Valid", type: "Purchase PAC", shareBalance: "4857.6789" },
+      { id: "4", date: "01/30/2025", grossAmount: "$1.26", netAmount: "$1.26", price: "$13.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "4722.6789" },
+      { id: "5", date: "12/30/2024", grossAmount: "$180.00", netAmount: "$180.00", price: "$13.5432", status: "Valid", type: "Purchase PAC", shareBalance: "4713.6789" },
+      { id: "6", date: "11/30/2024", grossAmount: "$1.08", netAmount: "$1.08", price: "$13.5432", status: "Valid", type: "Reinvested Distribution", shareBalance: "4578.6789" },
+    ],
+  };
+
+  // Get transactions for selected fund account
+  const transactions = selectedFundAccount && transactionsMap[selectedFundAccount] ? transactionsMap[selectedFundAccount] : [];
   
   // Get selected transaction data
   const selectedTransactionData = transactions.find(t => t.id === selectedTransaction) || null;
@@ -1988,20 +2104,23 @@ const ClientDetails = () => {
             </CardHeader>
             <CardContent className="pt-0">
               <p className="text-sm text-gray-700">{clientDetails.residentialAddress.line1}</p>
-              <p className="text-sm text-gray-700">{clientDetails.residentialAddress.line2}</p>
-              <p className="text-sm text-gray-700">{clientDetails.residentialAddress.line3}</p>
+              <p className="text-sm text-gray-700">
+                {clientDetails.residentialAddress.line2 && clientDetails.residentialAddress.line3 
+                  ? `${clientDetails.residentialAddress.line2}, ${clientDetails.residentialAddress.line3}`
+                  : clientDetails.residentialAddress.line2 || clientDetails.residentialAddress.line3}
+              </p>
               <p className="text-sm text-gray-700 mt-2">Home: {clientDetails.contact.home}</p>
               <p className="text-sm text-gray-700">Cell: {clientDetails.contact.cell}</p>
+              <p className="text-sm text-gray-700">Email: {clientDetails.contact.email}</p>
             </CardContent>
           </Card>
 
-          {/* Email Address Card */}
+          {/* Empty Tile */}
           <Card className="border border-gray-200 shadow-sm bg-white">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold text-gray-900">Email Address</CardTitle>
+              <CardTitle className="text-sm font-semibold text-gray-900">Empty Tile</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <p className="text-sm text-gray-700">{clientDetails.contact.email}</p>
             </CardContent>
           </Card>
 
@@ -4300,21 +4419,6 @@ const ClientDetails = () => {
                   ))}
                 </div>
 
-                {/* Selected Plan */}
-                <div className="border border-gray-300 rounded p-3 bg-blue-50">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-gray-600" />
-                      <div>
-                        <p className="text-xs font-medium text-gray-900">
-                          {selectedPlanData.accountNumber} ({selectedPlanData.type} {selectedPlanData.name}, {selectedPlanData.category})
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-xs font-semibold text-gray-900">{selectedPlanData.marketValue}</span>
-                  </div>
-                </div>
-
                 {/* Account Tabs */}
                 <Tabs value={accountViewType} onValueChange={(value) => setAccountViewType(value as "fund-accounts" | "gics")}>
                   <TabsList className="grid w-full grid-cols-2 h-8">
@@ -4334,34 +4438,40 @@ const ClientDetails = () => {
                       <Label htmlFor="include-inactive-accounts" className="text-xs text-gray-700 cursor-pointer">Include Inactive Accounts</Label>
                     </div>
                     <div className="space-y-2">
-                      {fundAccounts.map((account) => (
-                        <div
-                          key={account.id}
-                          onClick={() => {
-                            setSelectedFundAccount(account.id);
-                            setSelectedTransaction(null); // Clear transaction selection to show fund account details
-                          }}
-                          className={`border rounded p-2 cursor-pointer transition-colors ${
-                            selectedFundAccount === account.id
-                              ? "border-blue-500 bg-blue-50"
-                              : "border-gray-200 hover:bg-gray-50"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-gray-900 truncate">{account.fullName}</p>
-                            </div>
-                            <div className="flex items-center gap-2 ml-2">
-                              <span className="text-xs font-semibold text-gray-900">{account.marketValue}</span>
-                              <div className="flex items-center gap-1">
-                                <BarChart3 className="h-3 w-3 text-gray-500" />
-                                <FileText className="h-3 w-3 text-gray-500" />
-                                <HelpCircle className="h-3 w-3 text-gray-500" />
+                      {filteredFundAccounts.length > 0 ? (
+                        filteredFundAccounts.map((account) => (
+                          <div
+                            key={account.id}
+                            onClick={() => {
+                              setSelectedFundAccount(account.id);
+                              setSelectedTransaction(null); // Clear transaction selection to show fund account details
+                            }}
+                            className={`border rounded p-2 cursor-pointer transition-colors ${
+                              selectedFundAccount === account.id
+                                ? "border-blue-500 bg-blue-50"
+                                : "border-gray-200 hover:bg-gray-50"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-gray-900 truncate">{account.fullName}</p>
+                              </div>
+                              <div className="flex items-center gap-2 ml-2">
+                                <span className="text-xs font-semibold text-gray-900">{account.marketValue}</span>
+                                <div className="flex items-center gap-1">
+                                  <BarChart3 className="h-3 w-3 text-gray-500" />
+                                  <FileText className="h-3 w-3 text-gray-500" />
+                                  <HelpCircle className="h-3 w-3 text-gray-500" />
+                                </div>
                               </div>
                             </div>
                           </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-4 text-xs text-gray-500">
+                          {selectedPlanForDetails ? "No fund accounts found for this plan." : "Please select a plan to view fund accounts."}
                         </div>
-                      ))}
+                      )}
                     </div>
                   </TabsContent>
 
@@ -4414,7 +4524,7 @@ const ClientDetails = () => {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {fundAccounts.map((account) => (
+                              {filteredFundAccounts.map((account) => (
                                 <SelectItem key={account.id} value={account.id}>
                                   {account.id}
                                 </SelectItem>
@@ -7432,7 +7542,6 @@ const ClientDetails = () => {
                             <TableHead>Description</TableHead>
                             <TableHead className="w-[150px]">Origin</TableHead>
                             <TableHead className="w-[120px]">Created By</TableHead>
-                            <TableHead className="w-[100px]">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -7459,11 +7568,12 @@ const ClientDetails = () => {
                               <TableCell>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <div className="flex items-center justify-center">
-                                      <div className="p-1.5 bg-blue-100 rounded text-blue-700">
-                                        {getNoteTypeIcon(note.type)}
-                                      </div>
-                                    </div>
+                                    <button
+                                      onClick={() => navigateToOrigin(note)}
+                                      className="flex items-center justify-center p-1.5 bg-blue-100 rounded text-blue-700 hover:bg-blue-200 transition-colors cursor-pointer"
+                                    >
+                                      {getNoteTypeIcon(note.type)}
+                                    </button>
                                   </TooltipTrigger>
                                   <TooltipContent>
                                     <p>{note.type}</p>
@@ -7481,17 +7591,6 @@ const ClientDetails = () => {
                               </TableCell>
                               <TableCell className="text-sm text-gray-600">
                                 {note.createdBy || "N/A"}
-                              </TableCell>
-                              <TableCell>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                  onClick={() => navigateToOrigin(note)}
-                                >
-                                  <ArrowRight className="h-4 w-4 mr-1" />
-                                  Go to
-                                </Button>
                               </TableCell>
                             </TableRow>
                           ))}
