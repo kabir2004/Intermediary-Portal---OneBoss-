@@ -290,8 +290,8 @@ const ClientDetails = () => {
   const [noteDescription, setNoteDescription] = useState("");
   const [noteOrigin, setNoteOrigin] = useState<string>("");
   const [notesSearchTerm, setNotesSearchTerm] = useState("");
-  const [notesSortBy, setNotesSortBy] = useState<"date" | "type">("date");
   const [notesFilterType, setNotesFilterType] = useState<string>("all");
+  const [notesDateSortOrder, setNotesDateSortOrder] = useState<"asc" | "desc">("desc");
   const [selectedNoteForView, setSelectedNoteForView] = useState<Note | null>(null);
   const [isNoteDetailDialogOpen, setIsNoteDetailDialogOpen] = useState(false);
 
@@ -631,17 +631,19 @@ const ClientDetails = () => {
       );
     }
 
-    // Sort
+    // Sort by date based on sort order
     const sorted = [...filtered].sort((a, b) => {
-      if (notesSortBy === "date") {
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      if (notesDateSortOrder === "desc") {
+        return dateB - dateA; // Newest first
       } else {
-        return a.type.localeCompare(b.type);
+        return dateA - dateB; // Oldest first
       }
     });
 
     return sorted;
-  }, [allNotes, notesSearchTerm, notesSortBy, notesFilterType]);
+  }, [allNotes, notesSearchTerm, notesFilterType, notesDateSortOrder]);
 
   // Get icon for note type
   const getNoteTypeIcon = (type: NoteType) => {
@@ -8884,15 +8886,6 @@ const ClientDetails = () => {
                     className="pl-9"
                   />
                 </div>
-                <Select value={notesSortBy} onValueChange={(value) => setNotesSortBy(value as "date" | "type")}>
-                  <SelectTrigger className="w-[150px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="date">Sort by Date</SelectItem>
-                    <SelectItem value="type">Sort by Type</SelectItem>
-                  </SelectContent>
-                </Select>
                 <Select value={notesFilterType} onValueChange={setNotesFilterType}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue />
@@ -8919,7 +8912,19 @@ const ClientDetails = () => {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="w-[140px]">Date & Time</TableHead>
+                            <TableHead className="w-[140px]">
+                              <button
+                                onClick={() => setNotesDateSortOrder(notesDateSortOrder === "desc" ? "asc" : "desc")}
+                                className="flex items-center gap-1 hover:text-blue-600 transition-colors cursor-pointer"
+                              >
+                                Date & Time
+                                {notesDateSortOrder === "desc" ? (
+                                  <ChevronDown className="h-4 w-4" />
+                                ) : (
+                                  <ChevronUp className="h-4 w-4" />
+                                )}
+                              </button>
+                            </TableHead>
                             <TableHead className="w-[80px]">Type</TableHead>
                             <TableHead>Summary</TableHead>
                             <TableHead>Description</TableHead>
