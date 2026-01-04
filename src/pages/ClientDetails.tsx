@@ -3376,8 +3376,12 @@ const ClientDetails = () => {
               <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
                 {clientDetails.representative.language}
               </div>
-              <div className="w-8 h-8 border border-gray-300 rounded"></div>
-              <div className="w-8 h-8 border border-gray-300 rounded"></div>
+              <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
+                Empty Tile
+              </div>
+              <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
+                Empty Tile
+              </div>
             </div>
           </div>
           <Button
@@ -3598,15 +3602,12 @@ const ClientDetails = () => {
             </CardContent>
           </Card>
 
-          {/* Current Representative Card */}
+          {/* Empty Tile */}
           <Card className="border border-gray-200 shadow-sm bg-white">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold text-gray-900">Current Representative</CardTitle>
+              <CardTitle className="text-sm font-semibold text-gray-900">Empty Tile</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <p className="text-sm text-gray-700">{clientDetails.representative.name}</p>
-              <p className="text-sm font-semibold text-gray-900 mt-2 mb-1">Client Preferred Language</p>
-              <p className="text-sm text-gray-700">{clientDetails.representative.language}</p>
             </CardContent>
           </Card>
 
