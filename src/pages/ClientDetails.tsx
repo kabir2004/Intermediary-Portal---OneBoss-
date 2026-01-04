@@ -3364,9 +3364,21 @@ const ClientDetails = () => {
       <div className="space-y-6">
         {/* Client Name and Account */}
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Client: {client.name.split(" ").reverse().join(", ")}</h1>
-            <p className="text-sm text-gray-600 mt-1">Account {client.id}</p>
+          <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Client: {client.name.split(" ").reverse().join(", ")}</h1>
+              <p className="text-sm text-gray-600 mt-1">Account {client.id}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
+                {clientDetails.representative.name}
+              </div>
+              <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
+                {clientDetails.representative.language}
+              </div>
+              <div className="w-8 h-8 border border-gray-300 rounded"></div>
+              <div className="w-8 h-8 border border-gray-300 rounded"></div>
+            </div>
           </div>
           <Button
             variant="ghost"
