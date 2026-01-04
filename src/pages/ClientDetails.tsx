@@ -3675,7 +3675,7 @@ const ClientDetails = () => {
                                   setSelectedFundAccount(null);
                                   setSelectedTransaction(null);
                                 }}
-                              >{plan.accountNumber}</span> {getPlanCategoryText()} <span className="underline cursor-pointer">Marsh, Antoine</span>
+                              >{plan.accountNumber} {getPlanCategoryText()} Marsh, Antoine</span>
                             </p>
                             {plan.category === "Joint" && (
                               <div className="mt-0.5 px-1.5 py-0.5">
