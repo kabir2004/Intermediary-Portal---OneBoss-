@@ -3379,8 +3379,8 @@ const ClientDetails = () => {
               <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
                 Empty Tile
               </div>
-              <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
-                Empty Tile
+              <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-green-600 font-semibold whitespace-nowrap">
+                {clientDetails.totalAssets}
               </div>
             </div>
           </div>
@@ -3611,15 +3611,6 @@ const ClientDetails = () => {
             </CardContent>
           </Card>
 
-          {/* Total Assets Card */}
-          <Card className="border border-gray-200 shadow-sm bg-white">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold text-gray-900">Total Assets</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <p className="text-sm font-bold text-green-600">{clientDetails.totalAssets}</p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Financial Portfolio Section */}
