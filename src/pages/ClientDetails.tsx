@@ -2319,6 +2319,14 @@ const ClientDetails = () => {
       }
     }
   }, [id]);
+
+  // Initialize all plans as collapsed by default
+  useEffect(() => {
+    const currentClientData = getClientData(id);
+    const planCount = Object.values(currentClientData.summaryData).length;
+    const allAccountKeys = Array.from({ length: planCount }, (_, i) => `account${i + 1}`);
+    setCollapsedAccounts(new Set(allAccountKeys));
+  }, [id]);
   
   // Clear selected fund account if it doesn't belong to the selected plan
   useEffect(() => {
