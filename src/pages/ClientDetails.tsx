@@ -3684,6 +3684,11 @@ const ClientDetails = () => {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
+                          {isCollapsed && (
+                            <span className="text-xs font-semibold text-gray-900 mr-2">
+                              ${planTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
+                          )}
                           <BarChart3 className="h-3.5 w-3.5 cursor-pointer text-gray-700 hover:text-gray-900" />
                           <div className="bg-green-600 p-1 rounded">
                             <DollarSign className="h-3 w-3 text-white" />
