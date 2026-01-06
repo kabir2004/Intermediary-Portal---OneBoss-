@@ -2480,7 +2480,7 @@ const ClientDetails = () => {
     shareBalance: string;
   }>> = {
     "MFC-724": [
-    { id: "1", date: "04/25/2025", grossAmount: "$0.82", netAmount: "$0.82", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "11.8280" },
+      { id: "1", date: "04/25/2025", grossAmount: "$0.82", netAmount: "$0.82", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "11.8280" },
     { id: "2", date: "02/21/2025", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "10.8280" },
     { id: "3", date: "01/21/2025", grossAmount: "$25.00", netAmount: "$25.00", price: "$12.5499", status: "Valid", type: "Purchase PAC", shareBalance: "8.8280" },
     { id: "4", date: "12/20/2024", grossAmount: "$0.69", netAmount: "$0.69", price: "$12.5499", status: "Valid", type: "Reinvested Distribution", shareBalance: "6.8280" },
@@ -3685,7 +3685,7 @@ const ClientDetails = () => {
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           {isCollapsed && (
-                            <span className="text-xs font-semibold text-gray-900 mr-2">
+                            <span className="text-xs font-semibold text-gray-900 mr-96">
                               ${planTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </span>
                           )}
