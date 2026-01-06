@@ -3477,7 +3477,7 @@ const ClientDetails = () => {
         {clientViewTab === "summary" && (
           <>
             {/* Information Cards */}
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-5 gap-4">
           {/* Residential Address Card */}
           <Card className="border border-gray-200 shadow-sm bg-white">
             <CardHeader className="pb-3 relative">
@@ -3505,8 +3505,7 @@ const ClientDetails = () => {
                   ? `${clientDetails.residentialAddress.line2}, ${clientDetails.residentialAddress.line3}`
                   : clientDetails.residentialAddress.line2 || clientDetails.residentialAddress.line3}
               </p>
-              <p className="text-sm text-gray-700 mt-2">Home: {clientDetails.contact.home}</p>
-              <p className="text-sm text-gray-700">Cell: {clientDetails.contact.cell}</p>
+              <p className="text-sm text-gray-700 mt-2">Home: {clientDetails.contact.home} | Cell: {clientDetails.contact.cell}</p>
               <p className="text-sm text-gray-700">Email: {clientDetails.contact.email}</p>
             </CardContent>
           </Card>
@@ -3618,16 +3617,16 @@ const ClientDetails = () => {
           <CardContent className="pt-3 pb-3">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="flex w-full mb-2 h-8 bg-transparent p-0 gap-1">
-                <TabsTrigger value="investments" className="text-[10px] px-2 py-1.5 flex-1 whitespace-nowrap min-w-0">
+                <TabsTrigger value="investments" className="text-[10px] px-2 py-1.5 flex-1 whitespace-nowrap min-w-0 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-semibold">
                   Investments
                 </TabsTrigger>
-                <TabsTrigger value="cash" className="text-[10px] px-2 py-1.5 flex-1 whitespace-nowrap min-w-0">
+                <TabsTrigger value="cash" className="text-[10px] px-2 py-1.5 flex-1 whitespace-nowrap min-w-0 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-semibold">
                   Cash
                 </TabsTrigger>
-                <TabsTrigger value="trading-activity" className="text-[10px] px-2 py-1.5 flex-1 whitespace-nowrap min-w-0">
+                <TabsTrigger value="trading-activity" className="text-[10px] px-2 py-1.5 flex-1 whitespace-nowrap min-w-0 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-semibold">
                   Recent Trading Activity
                 </TabsTrigger>
-                <TabsTrigger value="documents" className="text-[10px] px-2 py-1.5 flex-1 relative whitespace-nowrap min-w-0">
+                <TabsTrigger value="documents" className="text-[10px] px-2 py-1.5 flex-1 relative whitespace-nowrap min-w-0 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-semibold">
                   Documents
                   <span className="absolute top-0 right-0 h-1.5 w-1.5 bg-orange-500 rounded-full"></span>
                 </TabsTrigger>
