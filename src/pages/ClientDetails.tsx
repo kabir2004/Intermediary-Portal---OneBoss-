@@ -3371,35 +3371,39 @@ const ClientDetails = () => {
     <PageLayout title="">
       <div className="space-y-6">
         {/* Client Name and Account */}
-        <div className="flex items-end justify-between">
-          <div className="flex items-end gap-4">
-            <div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
               <h1 className="text-2xl font-bold text-gray-900">Client: {client.name.split(" ").reverse().join(", ")}</h1>
-              <p className="text-sm text-gray-600 mt-1">Account {client.id}</p>
+              <div className="flex items-center gap-2">
+                <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
+                  {clientDetails.representative.name}
+                </div>
+                <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
+                  {clientDetails.representative.language}
+                </div>
+                <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
+                  Empty Tile
+                </div>
+              </div>
             </div>
-            <div className="flex items-end gap-2 pb-1">
-              <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
-                {clientDetails.representative.name}
-              </div>
-              <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
-                {clientDetails.representative.language}
-              </div>
-              <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
-                Empty Tile
-              </div>
+            <div className="flex items-center gap-2">
               <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-green-600 font-semibold whitespace-nowrap">
-                {clientDetails.totalAssets}
+                Net Acct Value: {clientDetails.totalAssets}
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => navigate("/clients")}
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0"
-            onClick={() => navigate("/clients")}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <div>
+            <p className="text-sm text-gray-600">Account {client.id}</p>
+          </div>
         </div>
 
         {/* Client View Navigation Tabs */}
@@ -3485,9 +3489,9 @@ const ClientDetails = () => {
         {clientViewTab === "summary" && (
           <>
             {/* Information Cards */}
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-6 gap-4">
           {/* Residential Address Card */}
-          <Card className="border border-gray-200 shadow-sm bg-white">
+          <Card className="border border-gray-200 shadow-sm bg-white col-span-2">
             <CardHeader className="pb-3 relative">
               <CardTitle className="text-sm font-semibold text-gray-900">Residential Address</CardTitle>
               {clientDetails.mailingAddress && (
@@ -3506,15 +3510,14 @@ const ClientDetails = () => {
                 </Tooltip>
               )}
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="pt-0 pb-0">
               <p className="text-sm text-gray-700">{clientDetails.residentialAddress.line1}</p>
               <p className="text-sm text-gray-700">
                 {clientDetails.residentialAddress.line2 && clientDetails.residentialAddress.line3 
                   ? `${clientDetails.residentialAddress.line2}, ${clientDetails.residentialAddress.line3}`
                   : clientDetails.residentialAddress.line2 || clientDetails.residentialAddress.line3}
               </p>
-              <p className="text-sm text-gray-700 mt-2">Home: {clientDetails.contact.home} | Cell: {clientDetails.contact.cell}</p>
-              <p className="text-sm text-gray-700">Email: {clientDetails.contact.email}</p>
+              <p className="text-xs text-gray-700 mt-2"><span className="font-semibold">Home:</span> {clientDetails.contact.home} | <span className="font-semibold">Cell:</span> {clientDetails.contact.cell} | <span className="font-semibold">Email:</span> {clientDetails.contact.email}</p>
             </CardContent>
           </Card>
 
@@ -3523,24 +3526,24 @@ const ClientDetails = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold text-gray-900">Empty Tile</CardTitle>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="pt-0 pb-0">
             </CardContent>
           </Card>
 
           {/* Client and Plan Exceptions Card */}
-          <Card className="border border-gray-200 shadow-sm bg-white">
-            <CardHeader className="pb-2">
+          <Card className="border border-gray-200 shadow-sm bg-white col-span-1">
+            <CardHeader className="pb-1.5">
               <CardTitle className="text-sm font-semibold text-gray-900">Client and Plan Exceptions</CardTitle>
             </CardHeader>
-            <CardContent className="pt-0 pb-3">
-              <div className="space-y-2.5">
+            <CardContent className="pt-0 pb-0">
+              <div className="space-y-1.5">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-2 cursor-pointer">
-                      <div className="flex-1 h-6 bg-gray-100 rounded overflow-hidden">
+                    <div className="flex items-center gap-1.5 cursor-pointer">
+                      <div className="flex-1 h-4 bg-gray-100 rounded overflow-hidden">
                         <div className="h-full bg-red-500 rounded" style={{ width: '50%' }}></div>
                       </div>
-                      <span className="text-xs text-gray-700 min-w-[100px]">Expired KYC's</span>
+                      <span className="text-[10px] text-gray-700 min-w-[85px]">Expired KYC's</span>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -3549,11 +3552,11 @@ const ClientDetails = () => {
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-2 cursor-pointer">
-                      <div className="flex-1 h-6 bg-gray-100 rounded overflow-hidden">
+                    <div className="flex items-center gap-1.5 cursor-pointer">
+                      <div className="flex-1 h-4 bg-gray-100 rounded overflow-hidden">
                         <div className="h-full bg-orange-500 rounded" style={{ width: '30%' }}></div>
                       </div>
-                      <span className="text-xs text-gray-700 min-w-[100px]">NIGO's</span>
+                      <span className="text-[10px] text-gray-700 min-w-[85px]">NIGO's</span>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -3562,11 +3565,11 @@ const ClientDetails = () => {
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-2 cursor-pointer">
-                      <div className="flex-1 h-6 bg-gray-100 rounded overflow-hidden">
+                    <div className="flex items-center gap-1.5 cursor-pointer">
+                      <div className="flex-1 h-4 bg-gray-100 rounded overflow-hidden">
                         <div className="h-full bg-yellow-500 rounded" style={{ width: '20%' }}></div>
                       </div>
-                      <span className="text-xs text-gray-700 min-w-[100px]">Missing KYP's</span>
+                      <span className="text-[10px] text-gray-700 min-w-[85px]">Missing KYP's</span>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -3578,31 +3581,31 @@ const ClientDetails = () => {
           </Card>
 
           {/* Client Profiler Card */}
-          <Card className="border border-gray-200 shadow-sm bg-white">
-            <CardHeader className="pb-3">
+          <Card className="border border-gray-200 shadow-sm bg-white col-span-1">
+            <CardHeader className="pb-1.5">
               <CardTitle className="text-sm font-semibold text-gray-900">Client Profiler</CardTitle>
             </CardHeader>
-            <CardContent className="pt-0 space-y-3">
+            <CardContent className="pt-0 pb-2 space-y-1.5">
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs text-gray-700">Retention Score</span>
-                  <span className="text-xs font-semibold text-gray-900">36.37</span>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] text-gray-700">Retention Score</span>
+                  <span className="text-[10px] font-semibold text-gray-900">36.37</span>
                 </div>
                 <div className="h-1 bg-gray-100 rounded overflow-hidden">
                   <div className="h-full bg-green-500 rounded" style={{ width: '86.37%' }}></div>
                 </div>
               </div>
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs text-gray-700">Engagement Score</span>
-                  <span className="text-xs font-semibold text-gray-900">N/A</span>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] text-gray-700">Engagement Score</span>
+                  <span className="text-[10px] font-semibold text-gray-900">N/A</span>
                 </div>
                 <div className="h-1 bg-red-500 rounded"></div>
               </div>
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs text-gray-700">Share of Wallet</span>
-                  <span className="text-xs font-semibold text-gray-900">100%</span>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] text-gray-700">Share of Wallet</span>
+                  <span className="text-[10px] font-semibold text-gray-900">100%</span>
                 </div>
                 <div className="h-1 bg-blue-500 rounded"></div>
               </div>
@@ -3614,7 +3617,7 @@ const ClientDetails = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold text-gray-900">Empty Tile</CardTitle>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="pt-0 pb-0">
             </CardContent>
           </Card>
 
