@@ -3511,7 +3511,7 @@ const ClientDetails = () => {
               )}
             </CardHeader>
             <CardContent className="pt-0 pb-0 pr-2">
-              <p className="text-sm text-gray-700 whitespace-nowrap">
+              <p className="text-sm text-gray-700 whitespace-nowrap pr-6">
                 {clientDetails.residentialAddress.line1}
                 {clientDetails.residentialAddress.line2 && `, ${clientDetails.residentialAddress.line2}`}
                 {clientDetails.residentialAddress.line3 && `, ${clientDetails.residentialAddress.line3}`}
