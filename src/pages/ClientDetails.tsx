@@ -3517,7 +3517,7 @@ const ClientDetails = () => {
                   ? `${clientDetails.residentialAddress.line2}, ${clientDetails.residentialAddress.line3}`
                   : clientDetails.residentialAddress.line2 || clientDetails.residentialAddress.line3}
               </p>
-              <p className="text-[10px] text-gray-700 mt-2"><span className="font-semibold">Home:</span> {clientDetails.contact.home} | <span className="font-semibold">Cell:</span> {clientDetails.contact.cell} | <span className="font-semibold">Email:</span> {clientDetails.contact.email}</p>
+              <p className="text-[9px] text-gray-700 mt-2"><span className="font-semibold">Home:</span> {clientDetails.contact.home} | <span className="font-semibold">Cell:</span> {clientDetails.contact.cell} | <span className="font-semibold">Email:</span> {clientDetails.contact.email}</p>
             </CardContent>
           </Card>
 
