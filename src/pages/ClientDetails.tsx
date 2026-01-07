@@ -3492,12 +3492,12 @@ const ClientDetails = () => {
         <div className="grid grid-cols-6 gap-4">
           {/* Residential Address Card */}
           <Card className="border border-gray-200 shadow-sm bg-white col-span-2">
-            <CardHeader className="pb-3 relative">
+            <CardHeader className="pb-3 relative pr-2">
               <CardTitle className="text-sm font-semibold text-gray-900">Residential Address</CardTitle>
               {clientDetails.mailingAddress && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="absolute top-3 right-3 text-blue-600 cursor-help text-sm font-bold">*</span>
+                    <span className="absolute top-3 right-2 text-blue-600 cursor-help text-sm font-bold">*</span>
                   </TooltipTrigger>
                   <TooltipContent>
                     <div className="space-y-1">
@@ -3510,19 +3510,19 @@ const ClientDetails = () => {
                 </Tooltip>
               )}
             </CardHeader>
-            <CardContent className="pt-0 pb-0">
-              <p className="text-sm text-gray-700">{clientDetails.residentialAddress.line1}</p>
-              <p className="text-sm text-gray-700">
-                {clientDetails.residentialAddress.line2 && clientDetails.residentialAddress.line3 
-                  ? `${clientDetails.residentialAddress.line2}, ${clientDetails.residentialAddress.line3}`
-                  : clientDetails.residentialAddress.line2 || clientDetails.residentialAddress.line3}
+            <CardContent className="pt-0 pb-0 pr-2">
+              <p className="text-sm text-gray-700 whitespace-nowrap">
+                {clientDetails.residentialAddress.line1}
+                {clientDetails.residentialAddress.line2 && `, ${clientDetails.residentialAddress.line2}`}
+                {clientDetails.residentialAddress.line3 && `, ${clientDetails.residentialAddress.line3}`}
               </p>
-              <p className="text-[9px] text-gray-700 mt-2"><span className="font-semibold">Home:</span> {clientDetails.contact.home} | <span className="font-semibold">Cell:</span> {clientDetails.contact.cell} | <span className="font-semibold">Email:</span> {clientDetails.contact.email}</p>
+              <p className="text-xs text-gray-700 mt-2"><span className="font-semibold">Home:</span> {clientDetails.contact.home} | <span className="font-semibold">Cell:</span> {clientDetails.contact.cell}</p>
+              <p className="text-xs text-gray-700 mt-1"><span className="font-semibold">Email:</span> {clientDetails.contact.email}</p>
             </CardContent>
           </Card>
 
           {/* Empty Tile */}
-          <Card className="border border-gray-200 shadow-sm bg-white">
+          <Card className="border border-gray-200 shadow-sm bg-white col-span-1">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold text-gray-900">Empty Tile</CardTitle>
             </CardHeader>

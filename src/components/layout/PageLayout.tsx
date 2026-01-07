@@ -18,7 +18,7 @@ export function PageLayout({ children, title }: PageLayoutProps) {
       <SidebarInset className="min-w-0 w-full">
         <Navbar />
         <main className="flex-1 bg-white min-w-0 w-full">
-          <div className="w-full px-3 lg:px-4 pb-3 lg:pb-4 pt-6 animate-fade-in">
+          <div className="w-full px-3 lg:px-4 pb-3 lg:pb-4 pt-6 animate-fade-in" style={{ minWidth: 'fit-content' }}>
             {title && <h1 className="text-2xl font-bold mb-6 text-gray-900">{title}</h1>}
             {children}
           </div>

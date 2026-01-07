@@ -105,18 +105,21 @@
     height: 100%;
     overflow-x: auto;
     overflow-y: auto;
+    min-width: 0;
   }
 
   body {
     @apply antialiased;
     min-height: 100%;
     width: 100%;
+    min-width: 0;
     overflow-x: auto;
     overflow-y: auto;
   }
 
   #root {
     width: 100%;
+    min-width: 0;
     min-height: 100%;
     display: block;
   }
