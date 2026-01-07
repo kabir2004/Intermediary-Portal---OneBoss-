@@ -101,9 +101,26 @@
     @apply border-border;
   }
 
-  html,
+  html {
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+  }
+
   body {
-    @apply h-full overflow-x-hidden antialiased;
+    @apply antialiased;
+    min-height: 100%;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+  }
+
+  #root {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    display: block;
   }
 
   body {

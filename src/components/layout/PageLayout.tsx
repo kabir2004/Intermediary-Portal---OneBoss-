@@ -15,10 +15,10 @@ export function PageLayout({ children, title }: PageLayoutProps) {
   return (
     <SidebarProvider defaultOpen={true}>
       <SidebarNavigation />
-      <SidebarInset>
+      <SidebarInset className="min-w-0 w-full max-w-full">
         <Navbar />
-        <main className="flex-1 overflow-y-auto bg-white">
-          <div className="container max-w-full px-3 lg:px-4 pb-3 lg:pb-4 pt-6 animate-fade-in">
+        <main className="flex-1 bg-white min-w-0 w-full max-w-full">
+          <div className="w-full max-w-full px-3 lg:px-4 pb-3 lg:pb-4 pt-6 animate-fade-in">
             {title && <h1 className="text-2xl font-bold mb-6 text-gray-900">{title}</h1>}
             {children}
           </div>
