@@ -111,14 +111,12 @@
     @apply antialiased;
     min-height: 100%;
     width: 100%;
-    max-width: 100%;
     overflow-x: auto;
     overflow-y: auto;
   }
 
   #root {
     width: 100%;
-    max-width: 100%;
     min-height: 100%;
     display: block;
   }
