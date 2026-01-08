@@ -217,7 +217,7 @@ const ClientDetails = () => {
   const [fundSearchTerm, setFundSearchTerm] = useState("");
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [planDetailTab, setPlanDetailTab] = useState("details");
-  const [planDetailsSubTab, setPlanDetailsSubTab] = useState("details");
+  const [planDetailsSubTab, setPlanDetailsSubTab] = useState("summary");
   const [allocationsView, setAllocationsView] = useState<"chart" | "table">("chart");
   const [chartsSubTab, setChartsSubTab] = useState<"smart-charts" | "allocations">("smart-charts");
   const [attachmentsSubTab, setAttachmentsSubTab] = useState<"rep-attachments" | "dealer-attachments" | "statement-history" | "trade-confirmations">("rep-attachments");
@@ -231,7 +231,7 @@ const ClientDetails = () => {
   const [transactionsSortBy, setTransactionsSortBy] = useState("Sort by Trade Date");
   const [selectedAccountFilter, setSelectedAccountFilter] = useState("Selected Account");
   const [selectedTransaction, setSelectedTransaction] = useState<string | null>(null);
-  const [transactionDetailTab, setTransactionDetailTab] = useState("details");
+  const [transactionDetailTab, setTransactionDetailTab] = useState("summary");
   const [isDepositDialogOpen, setIsDepositDialogOpen] = useState(false);
   const [depositAmount, setDepositAmount] = useState("0.00");
   const [isBuyUnitsDialogOpen, setIsBuyUnitsDialogOpen] = useState(false);
@@ -6489,7 +6489,7 @@ const ClientDetails = () => {
                 ) : selectedFundAccountData ? (
                   /* Fund Account Details */
                   <div className="space-y-4">
-                    <Tabs defaultValue="details">
+                    <Tabs defaultValue="summary">
                       <TabsList className="grid w-full grid-cols-8 h-8 mb-4">
                         <TabsTrigger value="summary" className="text-xs">Summary</TabsTrigger>
                         <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>
