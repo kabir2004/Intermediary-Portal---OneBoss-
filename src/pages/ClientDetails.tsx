@@ -6564,7 +6564,24 @@ const ClientDetails = () => {
                       </div>
                       
                       <TabsContent value="summary" className="mt-4">
-                        {/* Summary content - empty for now */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {/* Trading Actions Tile - Top Left */}
+                          <Card className="border border-gray-200 shadow-sm bg-white">
+                            <CardContent className="p-4">
+                              <div className="flex items-center justify-center gap-3">
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
+                                  <Minus className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
+                                  <ArrowLeftRight className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
                       </TabsContent>
                       
                       <TabsContent value="details" className="mt-4">
@@ -7453,7 +7470,24 @@ const ClientDetails = () => {
                   </div>
 
                   <TabsContent value="summary" className="mt-4">
-                    {/* Summary content - empty for now */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {/* Trading Actions Tile - Top Left */}
+                      <Card className="border border-gray-200 shadow-sm bg-white">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-center gap-3">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
+                              <ArrowLeftRight className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
                   </TabsContent>
 
                   <TabsContent value="details" className="mt-4">
