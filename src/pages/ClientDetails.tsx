@@ -7410,16 +7410,16 @@ const ClientDetails = () => {
                   <TabsContent value="details" className="mt-4">
                     {/* Details Sub-tabs */}
                     <Tabs value={planDetailsSubTab} onValueChange={setPlanDetailsSubTab}>
-                      <TabsList className="grid w-full grid-cols-6 h-8 mb-4">
-                        <TabsTrigger value="details" className="text-xs">
+                      <TabsList className="grid w-full grid-cols-6 h-auto mb-4 gap-1">
+                        <TabsTrigger value="details" className="text-xs whitespace-nowrap">
                           Details
                           <HelpCircle className="h-3 w-3 ml-1" />
                         </TabsTrigger>
-                        <TabsTrigger value="notes" className="text-xs">Notes</TabsTrigger>
-                        <TabsTrigger value="plan-attachments" className="text-xs">Plan Attachments</TabsTrigger>
-                        <TabsTrigger value="allocations" className="text-xs">Allocations</TabsTrigger>
-                        <TabsTrigger value="supplier-accounts" className="text-xs">Supplier Accounts</TabsTrigger>
-                        <TabsTrigger value="custom-compensation" className="text-xs">Custom Compensation</TabsTrigger>
+                        <TabsTrigger value="notes" className="text-xs whitespace-nowrap">Notes</TabsTrigger>
+                        <TabsTrigger value="plan-attachments" className="text-xs break-words leading-tight">Plan Attachments</TabsTrigger>
+                        <TabsTrigger value="allocations" className="text-xs whitespace-nowrap">Allocations</TabsTrigger>
+                        <TabsTrigger value="supplier-accounts" className="text-xs break-words leading-tight px-1">Supplier Accounts</TabsTrigger>
+                        <TabsTrigger value="custom-compensation" className="text-xs break-words leading-tight px-1">Custom Compensation</TabsTrigger>
                       </TabsList>
 
                       <TabsContent value="details" className="mt-4">
