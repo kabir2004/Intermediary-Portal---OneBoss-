@@ -10940,48 +10940,46 @@ const ClientDetails = () => {
             </Card>
 
             {/* Select Fund Company */}
-            <div>
+            <div className="relative">
               <label className="text-sm font-semibold text-gray-700 mb-2 block">
                 Select Fund Company
               </label>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 font-normal px-2 py-0.5 text-xs">
-                  Switch
-                </Badge>
-                <span className="text-xs text-gray-600">
-                  ({selectedProduct?.product?.split(" Series")[0] || "FIDELITY NORTHSTAR FUND"}) → ({selectedFundCompany || "Fidelity Investments"})
-                </span>
-              </div>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
                 <Input
                   type="text"
-                  value={companySearchTerm}
+                  value={selectedFundCompany || companySearchTerm}
                   onChange={(e) => {
                     const search = e.target.value;
                     setCompanySearchTerm(search);
+                    if (search !== selectedFundCompany) {
+                      setSelectedFundCompany("");
+                      setSelectedFundToSwitch("");
+                      setFundSearchTerm("");
+                    }
                   }}
                   onFocus={() => {
-                    if (!companySearchTerm) {
-                      setCompanySearchTerm("");
+                    if (selectedFundCompany) {
+                      setCompanySearchTerm(selectedFundCompany);
                     }
                   }}
                   placeholder="Select fund company"
                   className="pl-10"
                 />
               </div>
-              {companySearchTerm && (
-                <div className="mt-2 space-y-1 max-h-64 overflow-y-auto">
-                  {FUND_COMPANIES
-                    .filter((company) =>
-                      company.name.toLowerCase().includes(companySearchTerm.toLowerCase())
-                    )
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .map((company) => {
-                      const currentProductCompany = getProductCompany(selectedProduct);
-                      const isSameCompany = company.name === currentProductCompany;
-                      
-                      return (
+              {companySearchTerm && !selectedFundCompany && (
+                <div className="absolute z-50 w-full mt-1 max-h-56 overflow-y-auto border border-gray-200 rounded-md bg-white shadow-lg p-1.5">
+                  <div className="space-y-0.5">
+                    {FUND_COMPANIES
+                      .filter((company) =>
+                        company.name.toLowerCase().includes(companySearchTerm.toLowerCase())
+                      )
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((company) => {
+                        const currentProductCompany = getProductCompany(selectedProduct);
+                        const isSameCompany = company.name === currentProductCompany;
+                        
+                        return (
                         <Card
                           key={company.id}
                           className={`border cursor-pointer transition-colors ${
@@ -10993,22 +10991,22 @@ const ClientDetails = () => {
                           }`}
                           onClick={() => {
                             setSelectedFundCompany(company.name);
-                            setCompanySearchTerm(company.name);
+                            setCompanySearchTerm(""); // Clear search to hide dropdown
                             setSelectedFundToSwitch(""); // Reset fund selection when company changes
                             setFundSearchTerm("");
                           }}
                         >
-                          <CardContent className="p-3 flex items-center justify-between">
+                          <CardContent className="p-2 flex items-center justify-between">
                             <div>
-                              <p className="text-sm font-semibold text-gray-900">{company.name}</p>
-                              <p className="text-xs text-gray-600">{company.fundsCount} funds available</p>
+                              <p className="text-xs font-semibold text-gray-900">{company.name}</p>
+                              <p className="text-[10px] text-gray-600">{company.fundsCount} funds available</p>
                             </div>
                             {isSameCompany ? (
-                              <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 font-normal px-2 py-0.5 text-xs">
+                              <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 font-normal px-1.5 py-0.5 text-[10px]">
                                 Switch
                               </Badge>
                             ) : (
-                              <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100 font-normal px-2 py-0.5 text-xs">
+                              <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100 font-normal px-1.5 py-0.5 text-[10px]">
                                 Convert
                               </Badge>
                             )}
@@ -11016,61 +11014,74 @@ const ClientDetails = () => {
                         </Card>
                       );
                     })}
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Select Fund to Convert to */}
-            <div>
+            {/* Select Fund to Switch/Convert to */}
+            {selectedFundCompany && (
+            <div className="relative">
               <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                Select Fund to Convert to
+                Select Fund to {isConvert ? "Convert to" : "Switch to"}
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
                 <Input
                   type="text"
-                  value={fundSearchTerm}
+                  value={selectedFundToSwitch || fundSearchTerm}
                   onChange={(e) => {
                     const search = e.target.value;
                     setFundSearchTerm(search);
-                    if (!search) {
+                    if (search !== selectedFundToSwitch) {
                       setSelectedFundToSwitch("");
                     }
                   }}
+                  onFocus={() => {
+                    if (selectedFundToSwitch) {
+                      setFundSearchTerm(selectedFundToSwitch);
+                    }
+                  }}
                   placeholder={`Search ${selectedFundCompany || "Fidelity Investments"} funds by name, symbol, or category`}
-                  className="pl-10"
+                  className={`pl-10 ${selectedFundToSwitch ? (isConvert ? "bg-orange-50 border-orange-300" : "bg-blue-50 border-blue-300") : ""}`}
                 />
               </div>
-              {selectedFundCompany && fundSearchTerm && COMPANY_FUNDS[selectedFundCompany] && (
-                <div className="mt-2 space-y-1 max-h-48 overflow-y-auto">
-                  {COMPANY_FUNDS[selectedFundCompany]
-                    .filter((fund) =>
-                      fund.name.toLowerCase().includes(fundSearchTerm.toLowerCase()) ||
-                      fund.symbol.toLowerCase().includes(fundSearchTerm.toLowerCase()) ||
-                      fund.category.toLowerCase().includes(fundSearchTerm.toLowerCase())
-                    )
-                    .map((fund, index) => (
-                      <Card
-                        key={index}
-                        className={`border cursor-pointer transition-colors ${
-                          selectedFundToSwitch === fund.name
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-200 bg-gray-50 hover:bg-gray-100"
-                        }`}
-                        onClick={() => {
-                          setSelectedFundToSwitch(fund.name);
-                          setFundSearchTerm(fund.name);
-                        }}
-                      >
-                        <CardContent className="p-3">
-                          <p className="text-sm font-semibold text-gray-900">{fund.name}</p>
-                          <p className="text-xs text-gray-600">{fund.symbol} • {fund.category}</p>
-                        </CardContent>
-                      </Card>
-                    ))}
+              {selectedFundCompany && fundSearchTerm && !selectedFundToSwitch && COMPANY_FUNDS[selectedFundCompany] && (
+                <div className="absolute z-50 w-full mt-1 max-h-56 overflow-y-auto border border-gray-200 rounded-md bg-white shadow-lg p-1.5">
+                  <div className="space-y-0.5">
+                    {COMPANY_FUNDS[selectedFundCompany]
+                      .filter((fund) =>
+                        fund.name.toLowerCase().includes(fundSearchTerm.toLowerCase()) ||
+                        fund.symbol.toLowerCase().includes(fundSearchTerm.toLowerCase()) ||
+                        fund.category.toLowerCase().includes(fundSearchTerm.toLowerCase())
+                      )
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((fund, index) => (
+                        <Card
+                          key={index}
+                          className={`border cursor-pointer transition-colors ${
+                            selectedFundToSwitch === fund.name
+                              ? isConvert
+                                ? "border-orange-500 bg-orange-50"
+                                : "border-blue-500 bg-blue-50"
+                              : "border-gray-200 bg-gray-50 hover:bg-gray-100"
+                          }`}
+                          onClick={() => {
+                            setSelectedFundToSwitch(fund.name);
+                            setFundSearchTerm(""); // Clear search to hide dropdown
+                          }}
+                        >
+                          <CardContent className="p-2">
+                            <p className="text-xs font-semibold text-gray-900">{fund.name}</p>
+                            <p className="text-[10px] text-gray-600">{fund.symbol} • {fund.category}</p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </div>
                 </div>
               )}
             </div>
+            )}
 
             {/* Units to Switch/Convert */}
             <div>
