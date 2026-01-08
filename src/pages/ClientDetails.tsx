@@ -7393,15 +7393,17 @@ const ClientDetails = () => {
                 ) : (
                   /* Plan Details */
                   <Tabs value={planDetailTab} onValueChange={setPlanDetailTab}>
-                  <TabsList className="grid w-full grid-cols-7 h-8">
-                    <TabsTrigger value="summary" className="text-xs">Summary</TabsTrigger>
-                    <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>
-                    <TabsTrigger value="kyc" className="text-xs">KYC</TabsTrigger>
-                    <TabsTrigger value="beneficiaries" className="text-xs">Beneficiaries</TabsTrigger>
-                    <TabsTrigger value="actions" className="text-xs">Actions</TabsTrigger>
-                    <TabsTrigger value="trust-account" className="text-xs">Trust Account</TabsTrigger>
-                    <TabsTrigger value="reviews" className="text-xs">Reviews</TabsTrigger>
-                  </TabsList>
+                  <div className="w-full overflow-x-auto overflow-y-visible mb-4 min-w-0">
+                    <TabsList className="inline-flex h-auto p-1 gap-8 min-w-full w-max">
+                      <TabsTrigger value="summary" className="text-xs whitespace-nowrap flex-shrink-0">Summary</TabsTrigger>
+                      <TabsTrigger value="details" className="text-xs whitespace-nowrap flex-shrink-0">Details</TabsTrigger>
+                      <TabsTrigger value="kyc" className="text-xs whitespace-nowrap flex-shrink-0">KYC</TabsTrigger>
+                      <TabsTrigger value="beneficiaries" className="text-xs whitespace-nowrap flex-shrink-0">Beneficiaries</TabsTrigger>
+                      <TabsTrigger value="actions" className="text-xs whitespace-nowrap flex-shrink-0">Actions</TabsTrigger>
+                      <TabsTrigger value="trust-account" className="text-xs whitespace-nowrap flex-shrink-0">Trust Account</TabsTrigger>
+                      <TabsTrigger value="reviews" className="text-xs whitespace-nowrap flex-shrink-0">Reviews</TabsTrigger>
+                    </TabsList>
+                  </div>
 
                   <TabsContent value="summary" className="mt-4">
                     {/* Summary content - empty for now */}
@@ -7411,17 +7413,17 @@ const ClientDetails = () => {
                     {/* Details Sub-tabs */}
                     <Tabs value={planDetailsSubTab} onValueChange={setPlanDetailsSubTab}>
                       <div className="w-full overflow-x-auto overflow-y-visible mb-4 min-w-0">
-                        <TabsList className="inline-flex h-auto p-1 gap-2 min-w-full w-max">
+                        <TabsList className="inline-flex h-auto p-1 gap-6 min-w-full w-max">
                           <TabsTrigger value="details" className="text-xs whitespace-nowrap flex-shrink-0">
-                            Details
-                            <HelpCircle className="h-3 w-3 ml-1" />
-                          </TabsTrigger>
+                          Details
+                          <HelpCircle className="h-3 w-3 ml-1" />
+                        </TabsTrigger>
                           <TabsTrigger value="notes" className="text-xs whitespace-nowrap flex-shrink-0">Notes</TabsTrigger>
                           <TabsTrigger value="plan-attachments" className="text-xs whitespace-nowrap flex-shrink-0">Plan Attachments</TabsTrigger>
                           <TabsTrigger value="allocations" className="text-xs whitespace-nowrap flex-shrink-0">Allocations</TabsTrigger>
                           <TabsTrigger value="supplier-accounts" className="text-xs whitespace-nowrap flex-shrink-0">Supplier Accounts</TabsTrigger>
                           <TabsTrigger value="custom-compensation" className="text-xs whitespace-nowrap flex-shrink-0">Custom Compensation</TabsTrigger>
-                        </TabsList>
+                      </TabsList>
                       </div>
 
                       <TabsContent value="details" className="mt-4">
