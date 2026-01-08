@@ -3726,6 +3726,7 @@ const ClientDetails = () => {
                                   <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 min-w-[200px]">Product</TableHead>
                                   <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[80px]">Risk</TableHead>
                                   <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[150px]">Objective</TableHead>
+                                  <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[120px] text-center">Actions</TableHead>
                                   <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[130px] text-right">Market value</TableHead>
                               </TableRow>
                             </TableHeader>
@@ -3762,6 +3763,19 @@ const ClientDetails = () => {
                                           <Folder className="h-2.5 w-2.5 text-red-600" />
                                           <Lightbulb className="h-2.5 w-2.5 text-yellow-600" />
                                         </div>
+                                      </div>
+                                    </TableCell>
+                                    <TableCell className="text-xs py-2 px-3 text-center">
+                                      <div className="flex items-center justify-center gap-1">
+                                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                                          <Plus className="h-3 w-3" />
+                                        </Button>
+                                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                                          <Minus className="h-3 w-3" />
+                                        </Button>
+                                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                                          <ArrowLeftRight className="h-3 w-3" />
+                                        </Button>
                                       </div>
                                     </TableCell>
                                     <TableCell className="text-xs font-semibold py-2 px-3 text-right">
@@ -5705,6 +5719,7 @@ const ClientDetails = () => {
                       <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 min-w-[200px]">Product</TableHead>
                       <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[80px]">Risk</TableHead>
                       <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[150px]">Objective</TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[120px] text-center">Actions</TableHead>
                       <TableHead className="text-xs font-semibold text-gray-700 py-2 px-3 w-[130px] text-right">Market value</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -5726,6 +5741,19 @@ const ClientDetails = () => {
                           </div>
                         </div>
                       </TableCell>
+                      <TableCell className="text-xs py-2 px-3 text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                            <ArrowLeftRight className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </TableCell>
                       <TableCell className="text-xs font-semibold py-2 px-3 text-right">$3,747.33</TableCell>
                     </TableRow>
                     <TableRow className="bg-blue-50">
@@ -5743,6 +5771,19 @@ const ClientDetails = () => {
                             <Folder className="h-2.5 w-2.5 text-red-600" />
                             <Lightbulb className="h-2.5 w-2.5 text-yellow-600" />
                           </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-xs py-2 px-3 text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                            <ArrowLeftRight className="h-3 w-3" />
+                          </Button>
                         </div>
                       </TableCell>
                       <TableCell className="text-xs font-semibold py-2 px-3 text-right">$11,466.96</TableCell>
