@@ -240,6 +240,7 @@ const ClientDetails = () => {
   const [isSellOrderConfirmedDialogOpen, setIsSellOrderConfirmedDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [selectedPlanBalance, setSelectedPlanBalance] = useState<number>(0);
   const [investmentAmount, setInvestmentAmount] = useState("200");
   const [numberOfUnits, setNumberOfUnits] = useState("");
   const [sellUnits, setSellUnits] = useState("200");
@@ -3767,13 +3768,98 @@ const ClientDetails = () => {
                                     </TableCell>
                                     <TableCell className="text-xs py-2 px-3 text-center">
                                       <div className="flex items-center justify-center gap-1">
-                                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          className="h-6 w-6 p-0 hover:bg-gray-100"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            const priceStr = fund.currentPrice || "$0.00";
+                                            const price = parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 0;
+                                            const marketValueNum = parseFloat(fund.marketValue.replace(/[^0-9.]/g, ''));
+                                            const units = price > 0 ? (marketValueNum / price) : 0;
+                                            const planBalance = getPlanTotalValue(planInvestments);
+                                            
+                                            setSelectedProduct({
+                                              product: fund.productName,
+                                              units: units > 0 ? units.toFixed(2) : "0.00",
+                                              price: price > 0 ? `$${price.toFixed(2)}` : "$0.00",
+                                              marketValue: `$${marketValueFormatted}`
+                                            });
+                                            setSelectedPlan({
+                                              shortType: plan.type || "RRSP",
+                                              accountNumber: plan.accountNumber || ""
+                                            });
+                                            setSelectedPlanBalance(planBalance);
+                                            setInvestmentAmount("");
+                                            setNumberOfUnits("");
+                                            setIsBuyUnitsDialogOpen(true);
+                                          }}
+                                        >
                                           <Plus className="h-3 w-3" />
                                         </Button>
-                                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          className="h-6 w-6 p-0 hover:bg-gray-100"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            const priceStr = fund.currentPrice || "$0.00";
+                                            const price = parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 0;
+                                            const marketValueNum = parseFloat(fund.marketValue.replace(/[^0-9.]/g, ''));
+                                            const units = price > 0 ? (marketValueNum / price) : 0;
+                                            const planBalance = getPlanTotalValue(planInvestments);
+                                            
+                                            setSelectedProduct({
+                                              product: fund.productName,
+                                              units: units > 0 ? units.toFixed(2) : "0.00",
+                                              price: price > 0 ? `$${price.toFixed(2)}` : "$0.00",
+                                              marketValue: `$${marketValueFormatted}`
+                                            });
+                                            setSelectedPlan({
+                                              shortType: plan.type || "RRSP",
+                                              accountNumber: plan.accountNumber || ""
+                                            });
+                                            setSelectedPlanBalance(planBalance);
+                                            setSellUnits("");
+                                            setSellDollarAmount("");
+                                            setIsSellUnitsDialogOpen(true);
+                                          }}
+                                        >
                                           <Minus className="h-3 w-3" />
                                         </Button>
-                                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          className="h-6 w-6 p-0 hover:bg-gray-100"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            const priceStr = fund.currentPrice || "$0.00";
+                                            const price = parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 0;
+                                            const marketValueNum = parseFloat(fund.marketValue.replace(/[^0-9.]/g, ''));
+                                            const units = price > 0 ? (marketValueNum / price) : 0;
+                                            const planBalance = getPlanTotalValue(planInvestments);
+                                            
+                                            setSelectedProduct({
+                                              product: fund.productName,
+                                              units: units > 0 ? units.toFixed(2) : "0.00",
+                                              price: price > 0 ? `$${price.toFixed(2)}` : "$0.00",
+                                              marketValue: `$${marketValueFormatted}`,
+                                              supplier: fund.supplier
+                                            });
+                                            setSelectedPlan({
+                                              shortType: plan.type || "RRSP",
+                                              accountNumber: plan.accountNumber || ""
+                                            });
+                                            setSelectedPlanBalance(planBalance);
+                                            setSelectedFundCompany("");
+                                            setSelectedFundToSwitch("");
+                                            setUnitsToSwitch("");
+                                            setCompanySearchTerm("");
+                                            setFundSearchTerm("");
+                                            setIsSwitchDialogOpen(true);
+                                          }}
+                                        >
                                           <ArrowLeftRight className="h-3 w-3" />
                                         </Button>
                                       </div>
@@ -5743,13 +5829,89 @@ const ClientDetails = () => {
                       </TableCell>
                       <TableCell className="text-xs py-2 px-3 text-center">
                         <div className="flex items-center justify-center gap-1">
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 hover:bg-gray-100"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const planInvestments = getPlanInvestments(selectedPlanForDetails);
+                              const planBalance = getPlanTotalValue(planInvestments);
+                              
+                              setSelectedProduct({
+                                product: "MANULIFE SIMPLICITY MODERATE PORTFOLIO",
+                                units: "150.00",
+                                price: "$175.50",
+                                marketValue: "$3,747.33"
+                              });
+                              setSelectedPlan({
+                                shortType: selectedPlanData?.type || "RRSP",
+                                accountNumber: selectedPlanData?.accountNumber || ""
+                              });
+                              setSelectedPlanBalance(planBalance);
+                              setInvestmentAmount("");
+                              setNumberOfUnits("");
+                              setIsBuyUnitsDialogOpen(true);
+                            }}
+                          >
                             <Plus className="h-3 w-3" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 hover:bg-gray-100"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const planInvestments = getPlanInvestments(selectedPlanForDetails);
+                              const planBalance = getPlanTotalValue(planInvestments);
+                              
+                              setSelectedProduct({
+                                product: "MANULIFE SIMPLICITY MODERATE PORTFOLIO",
+                                units: "150.00",
+                                price: "$175.50",
+                                marketValue: "$3,747.33"
+                              });
+                              setSelectedPlan({
+                                shortType: selectedPlanData?.type || "RRSP",
+                                accountNumber: selectedPlanData?.accountNumber || ""
+                              });
+                              setSelectedPlanBalance(planBalance);
+                              setSellUnits("");
+                              setSellDollarAmount("");
+                              setIsSellUnitsDialogOpen(true);
+                            }}
+                          >
                             <Minus className="h-3 w-3" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 hover:bg-gray-100"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const planInvestments = getPlanInvestments(selectedPlanForDetails);
+                              const planBalance = getPlanTotalValue(planInvestments);
+                              
+                              setSelectedProduct({
+                                product: "MANULIFE SIMPLICITY MODERATE PORTFOLIO",
+                                units: "150.00",
+                                price: "$175.50",
+                                marketValue: "$3,747.33",
+                                supplier: "MFC"
+                              });
+                              setSelectedPlan({
+                                shortType: selectedPlanData?.type || "RRSP",
+                                accountNumber: selectedPlanData?.accountNumber || ""
+                              });
+                              setSelectedPlanBalance(planBalance);
+                              setSelectedFundCompany("");
+                              setSelectedFundToSwitch("");
+                              setUnitsToSwitch("");
+                              setCompanySearchTerm("");
+                              setFundSearchTerm("");
+                              setIsSwitchDialogOpen(true);
+                            }}
+                          >
                             <ArrowLeftRight className="h-3 w-3" />
                           </Button>
                         </div>
@@ -5775,13 +5937,89 @@ const ClientDetails = () => {
                       </TableCell>
                       <TableCell className="text-xs py-2 px-3 text-center">
                         <div className="flex items-center justify-center gap-1">
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 hover:bg-gray-100"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const planInvestments = getPlanInvestments(selectedPlanForDetails);
+                              const planBalance = getPlanTotalValue(planInvestments);
+                              
+                              setSelectedProduct({
+                                product: "MANULIFE DIVIDEND INCOME FUND",
+                                units: "150.00",
+                                price: "$175.50",
+                                marketValue: "$11,466.96"
+                              });
+                              setSelectedPlan({
+                                shortType: selectedPlanData?.type || "RRSP",
+                                accountNumber: selectedPlanData?.accountNumber || ""
+                              });
+                              setSelectedPlanBalance(planBalance);
+                              setInvestmentAmount("");
+                              setNumberOfUnits("");
+                              setIsBuyUnitsDialogOpen(true);
+                            }}
+                          >
                             <Plus className="h-3 w-3" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 hover:bg-gray-100"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const planInvestments = getPlanInvestments(selectedPlanForDetails);
+                              const planBalance = getPlanTotalValue(planInvestments);
+                              
+                              setSelectedProduct({
+                                product: "MANULIFE DIVIDEND INCOME FUND",
+                                units: "150.00",
+                                price: "$175.50",
+                                marketValue: "$11,466.96"
+                              });
+                              setSelectedPlan({
+                                shortType: selectedPlanData?.type || "RRSP",
+                                accountNumber: selectedPlanData?.accountNumber || ""
+                              });
+                              setSelectedPlanBalance(planBalance);
+                              setSellUnits("");
+                              setSellDollarAmount("");
+                              setIsSellUnitsDialogOpen(true);
+                            }}
+                          >
                             <Minus className="h-3 w-3" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 hover:bg-gray-100"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const planInvestments = getPlanInvestments(selectedPlanForDetails);
+                              const planBalance = getPlanTotalValue(planInvestments);
+                              
+                              setSelectedProduct({
+                                product: "MANULIFE SIMPLICITY MODERATE PORTFOLIO",
+                                units: "150.00",
+                                price: "$175.50",
+                                marketValue: "$3,747.33",
+                                supplier: "MFC"
+                              });
+                              setSelectedPlan({
+                                shortType: selectedPlanData?.type || "RRSP",
+                                accountNumber: selectedPlanData?.accountNumber || ""
+                              });
+                              setSelectedPlanBalance(planBalance);
+                              setSelectedFundCompany("");
+                              setSelectedFundToSwitch("");
+                              setUnitsToSwitch("");
+                              setCompanySearchTerm("");
+                              setFundSearchTerm("");
+                              setIsSwitchDialogOpen(true);
+                            }}
+                          >
                             <ArrowLeftRight className="h-3 w-3" />
                           </Button>
                         </div>
@@ -10179,57 +10417,58 @@ const ClientDetails = () => {
       <Dialog open={isBuyUnitsDialogOpen} onOpenChange={setIsBuyUnitsDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-lg text-green-600">
+            <DialogTitle className="flex items-center gap-2 text-lg">
               <Plus className="h-5 w-5 text-green-600" />
               Buy More Units
             </DialogTitle>
             <DialogDescription className="text-sm text-gray-600 mt-2">
-              Purchase additional units of {selectedProduct?.product?.split(" Series")[0] || selectedProduct?.product || "product"}
+              Purchase additional units of {selectedProduct?.product?.split(" Series")[0] || selectedProduct?.product || "Apple Inc."}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            {/* Trust Account CAD */}
+            {/* Account Balance */}
             <Card className="border border-blue-200 bg-blue-50">
               <CardContent className="p-4">
-                <p className="text-xs text-gray-600 mb-2">$ Trust Account CAD</p>
-                <p className="text-2xl font-bold text-gray-900 mb-2">$1,250.00</p>
+                <div className="flex justify-between items-start mb-2">
+                  <p className="text-xs font-semibold text-gray-700">Account Balance</p>
+                  <p className="text-xs font-semibold text-gray-700">{selectedPlan?.shortType || "RRSP"} CAD</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900 mb-2">${selectedPlanBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-600">Settled:</span>
-                    <span className="text-green-600 font-medium">$1,250.00</span>
+                    <span className="text-gray-900 font-medium">${selectedPlanBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-600">Unsettled:</span>
-                    <span className="text-orange-600 font-medium">$0.00</span>
+                    <span className="text-gray-900 font-medium">$0.00</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Current Holdings */}
-            <Card className="border border-gray-200">
-              <CardContent className="p-4">
-                <p className="text-sm font-semibold text-gray-900 mb-3">Current Holdings ({selectedPlan?.shortType || "RESP"})</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Units:</span>
-                    <span className="text-gray-900 font-medium">
-                      {selectedProduct?.units?.replace(" Units", "") || "1247.32"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Price:</span>
-                    <span className="text-gray-900 font-medium">
-                      {selectedProduct?.price?.replace(" Per Unit", "") || "$9.41"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Market Value:</span>
-                    <span className="text-gray-900 font-medium">{selectedProduct?.marketValue || "$11,734.85"}</span>
-                  </div>
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-900">Current Holdings ({selectedPlan?.shortType || "RRSP"})</p>
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div>
+                  <p className="text-xs text-gray-600 mb-1">Units</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {selectedProduct?.units || "150.00"}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <div>
+                  <p className="text-xs text-gray-600 mb-1">Price</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {selectedProduct?.price || "$175.50"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-600 mb-1">Market Value</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedProduct?.marketValue || "$26,325.00"}</p>
+                </div>
+              </div>
+            </div>
 
             {/* Investment Input */}
             <div className="space-y-4">
@@ -10245,7 +10484,7 @@ const ClientDetails = () => {
                     setInvestmentAmount(value);
                     if (value && selectedProduct?.price) {
                       const price = parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""));
-                      const units = (parseFloat(value) / price).toFixed(2);
+                      const units = (parseFloat(value) / price).toFixed(4);
                       setNumberOfUnits(units);
                     } else {
                       setNumberOfUnits("");
@@ -10282,12 +10521,11 @@ const ClientDetails = () => {
             {/* Estimated Cost */}
             <Card className="border border-blue-200 bg-blue-50">
               <CardContent className="p-4">
-                <p className="text-sm font-semibold text-gray-900 mb-3">Estimated Cost</p>
+                <div className="flex justify-between items-start mb-2">
+                  <p className="text-sm font-semibold text-gray-900">Estimated Cost</p>
+                  <p className="text-2xl font-bold text-gray-900">${investmentAmount ? parseFloat(investmentAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00"}</p>
+                </div>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Estimated Cost:</span>
-                    <span className="text-gray-900 font-bold">${investmentAmount || "0"}</span>
-                  </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Units to purchase:</span>
                     <span className="text-gray-900 font-medium">
@@ -10295,14 +10533,14 @@ const ClientDetails = () => {
                         ? (
                             parseFloat(investmentAmount) /
                             parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""))
-                          ).toFixed(2)
-                        : "0")}
+                          ).toFixed(4)
+                        : "0.0000")}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Based on avg. cost</span>
                     <span className="text-gray-900 font-medium">
-                      {selectedProduct?.price?.replace(" Per Unit", "") || "$9.41"}
+                      {selectedProduct?.price || "$175.50"}
                     </span>
                   </div>
                 </div>
@@ -10322,31 +10560,23 @@ const ClientDetails = () => {
             </Button>
             <Button
               className="bg-green-600 hover:bg-green-700 text-white"
+              disabled={!investmentAmount || parseFloat(investmentAmount) <= 0}
               onClick={() => {
-                // Generate order ID
-                const orderId = `ORD-${Date.now()}`;
-                const now = new Date();
-                const orderDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}, ${now.toLocaleTimeString()}`;
-                
-                const units = numberOfUnits || (investmentAmount && selectedProduct?.price
-                  ? (
-                      parseFloat(investmentAmount) /
-                      parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""))
-                    ).toFixed(2)
-                  : "0");
+                const price = selectedProduct?.price ? parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", "")) : 175.50;
+                const units = numberOfUnits || (investmentAmount
+                  ? (parseFloat(investmentAmount) / price).toFixed(4)
+                  : "0.0000");
                 
                 setOrderDetails({
-                  orderId,
-                  fund: selectedProduct?.product?.split(" Series")[0] || "FIDELITY NORTHSTAR FUND",
-                  plan: selectedPlan?.shortType || "RESP",
+                  product: selectedProduct?.product?.split(" Series")[0] || selectedProduct?.product || "AAPL - Apple Inc.",
                   units: units,
-                  amount: `$${investmentAmount || "0"}`,
-                  time: orderDate,
+                  price: `$${price.toFixed(2)}`,
+                  totalCost: `$${investmentAmount ? parseFloat(investmentAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00"}`,
                 });
                 
                 setIsBuyUnitsDialogOpen(false);
                 setIsOrderConfirmedDialogOpen(true);
-                setInvestmentAmount("200");
+                setInvestmentAmount("");
                 setNumberOfUnits("");
               }}
             >
@@ -10359,71 +10589,59 @@ const ClientDetails = () => {
       {/* Order Confirmed Dialog */}
       <Dialog open={isOrderConfirmedDialogOpen} onOpenChange={setIsOrderConfirmedDialogOpen}>
         <DialogContent className="sm:max-w-[450px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-lg text-green-600">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-              Order Confirmed
-            </DialogTitle>
-            <DialogDescription className="text-sm text-gray-600 mt-2">
+          <DialogHeader className="text-center">
+            <div className="flex justify-center mb-2">
+              <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                <CheckCircle2 className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+            <DialogTitle className="text-lg font-semibold text-center">Order Confirmation</DialogTitle>
+            <DialogDescription className="text-sm text-gray-600 mt-2 text-center">
               Your buy order has been placed successfully
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {/* Order Details */}
-            <Card className="border border-green-200 bg-green-50">
+            <Card className="border border-gray-200 bg-white">
               <CardContent className="p-4">
-                <p className="text-sm font-semibold text-green-800 mb-3">Order Details:</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-green-700">Order ID:</span>
-                    <span className="text-green-900 font-medium">{orderDetails?.orderId || "ORD-1765757958548"}</span>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Product</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {orderDetails?.product || "AAPL - Apple Inc."}
+                    </p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-700">Fund:</span>
-                    <span className="text-green-900 font-medium">{orderDetails?.fund || "FIDELITY NORTHSTAR FUND"}</span>
+                  <div className="border-t border-gray-200 pt-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Units</p>
+                        <p className="text-sm font-medium text-gray-900">{orderDetails?.units || "5.6980"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Price per Unit</p>
+                        <p className="text-sm font-medium text-gray-900">{orderDetails?.price || "$175.50"}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-700">Plan:</span>
-                    <span className="text-green-900 font-medium">{orderDetails?.plan || "RESP"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-700">Units:</span>
-                    <span className="text-green-900 font-medium">{orderDetails?.units || "21.25"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-700">Amount:</span>
-                    <span className="text-green-900 font-medium">{orderDetails?.amount || "$200"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-700">Time:</span>
-                    <span className="text-green-900 font-medium">{orderDetails?.time || "12/14/2025, 7:19:18 PM"}</span>
+                  <div className="border-t border-gray-200 pt-3">
+                    <div className="flex justify-between items-center">
+                      <p className="text-sm font-semibold text-gray-900">Total Cost</p>
+                      <p className="text-sm font-bold text-gray-900">{orderDetails?.totalCost || "$1,000.00"}</p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
-
-            {/* Processing Status */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-700">Processing Status:</span>
-                <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 font-normal px-2 py-0.5 text-xs">
-                  Pending
-                </Badge>
-              </div>
-              <p className="text-xs text-blue-600">
-                Order will be processed at next market close
-              </p>
-            </div>
           </div>
           <DialogFooter>
             <Button
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               onClick={() => {
                 setIsOrderConfirmedDialogOpen(false);
                 setOrderDetails(null);
               }}
             >
-              Done
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -10438,34 +10656,32 @@ const ClientDetails = () => {
               Sell Units
             </DialogTitle>
             <DialogDescription className="text-sm text-gray-600 mt-2">
-              Sell units of {selectedProduct?.product?.split(" Series")[0] || selectedProduct?.product || "product"}
+              Sell units of {selectedProduct?.product?.split(" Series")[0] || selectedProduct?.product || "Apple Inc."}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {/* Current Holdings */}
-            <Card className="border border-gray-200 bg-gray-50">
-              <CardContent className="p-4">
-                <p className="text-sm font-semibold text-gray-900 mb-3">Current Holdings ({selectedPlan?.shortType || "RESP"})</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Units Available:</span>
-                    <span className="text-gray-900 font-medium">
-                      {selectedProduct?.units?.replace(" Units", "") || "1247.32"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Price:</span>
-                    <span className="text-gray-900 font-medium">
-                      {selectedProduct?.price?.replace(" Per Unit", "") || "$9.41"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Market Value:</span>
-                    <span className="text-gray-900 font-medium">{selectedProduct?.marketValue || "$11,734.85"}</span>
-                  </div>
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-900">Current Holdings ({selectedPlan?.shortType || "RRSP"})</p>
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div>
+                  <p className="text-xs text-gray-600 mb-1">Units Available</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {selectedProduct?.units || "150.00"}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <div>
+                  <p className="text-xs text-gray-600 mb-1">Price</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {selectedProduct?.price || "$175.50"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-600 mb-1">Market Value</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedProduct?.marketValue || "$26,325.00"}</p>
+                </div>
+              </div>
+            </div>
 
             {/* Sell Input */}
             <div className="space-y-4">
@@ -10475,21 +10691,43 @@ const ClientDetails = () => {
                 </label>
                 <Input
                   type="number"
+                  step="any"
                   value={sellUnits}
                   onChange={(e) => {
                     const value = e.target.value;
                     setSellUnits(value);
                     if (value && selectedProduct?.price) {
                       const price = parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""));
-                      const amount = (parseFloat(value) * price).toFixed(2);
-                      setSellDollarAmount(amount);
+                      const maxUnits = parseFloat(selectedProduct?.units || "150.00");
+                      const inputUnits = parseFloat(value);
+                      if (!isNaN(inputUnits) && price > 0) {
+                        const unitsToUse = inputUnits > maxUnits ? maxUnits : inputUnits;
+                        const amount = (unitsToUse * price).toFixed(2);
+                        setSellDollarAmount(amount);
+                      } else {
+                        setSellDollarAmount("");
+                      }
                     } else {
                       setSellDollarAmount("");
                     }
                   }}
-                  placeholder={`Max: ${selectedProduct?.units?.replace(" Units", "") || "1247.32"}`}
+                  onBlur={(e) => {
+                    const value = e.target.value;
+                    if (value && selectedProduct?.price) {
+                      const price = parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""));
+                      const maxUnits = parseFloat(selectedProduct?.units || "150.00");
+                      const inputUnits = parseFloat(value);
+                      if (!isNaN(inputUnits) && price > 0) {
+                        const unitsToUse = inputUnits > maxUnits ? maxUnits : inputUnits;
+                        setSellUnits(unitsToUse.toFixed(4));
+                        const amount = (unitsToUse * price).toFixed(2);
+                        setSellDollarAmount(amount);
+                      }
+                    }
+                  }}
+                  placeholder={`Max: ${selectedProduct?.units || "150.00"}`}
                   className="text-lg font-semibold"
-                  max={selectedProduct?.units?.replace(" Units", "") || "1247.32"}
+                  max={parseFloat(selectedProduct?.units || "150.00")}
                 />
               </div>
               <div>
@@ -10498,14 +10736,21 @@ const ClientDetails = () => {
                 </label>
                 <Input
                   type="number"
+                  step="any"
                   value={sellDollarAmount}
                   onChange={(e) => {
                     const value = e.target.value;
                     setSellDollarAmount(value);
                     if (value && selectedProduct?.price) {
                       const price = parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""));
-                      const units = (parseFloat(value) / price).toFixed(2);
-                      setSellUnits(units);
+                      const maxUnits = parseFloat(selectedProduct?.units || "150.00");
+                      const calculatedUnits = parseFloat(value) / price;
+                      const unitsToUse = calculatedUnits > maxUnits ? maxUnits : calculatedUnits;
+                      if (!isNaN(unitsToUse) && price > 0) {
+                        setSellUnits(unitsToUse.toFixed(4));
+                      } else {
+                        setSellUnits("");
+                      }
                     } else {
                       setSellUnits("");
                     }
@@ -10517,26 +10762,29 @@ const ClientDetails = () => {
             </div>
 
             {/* Estimated Proceeds */}
-            <Card className="border border-orange-200 bg-orange-50">
+            <Card className="border border-yellow-200 bg-yellow-50">
               <CardContent className="p-4">
-                <p className="text-sm font-semibold text-orange-900 mb-3">Estimated Proceeds</p>
+                <div className="flex justify-between items-start mb-2">
+                  <p className="text-sm font-semibold text-gray-900">Estimated Proceeds</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    ${sellDollarAmount 
+                      ? parseFloat(sellDollarAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                      : (sellUnits && selectedProduct?.price
+                        ? (parseFloat(sellUnits) * parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""))).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                        : "0.00")}
+                  </p>
+                </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-orange-700">Estimated Proceeds:</span>
-                    <span className="text-orange-900 font-bold">
-                      ${sellDollarAmount || (sellUnits && selectedProduct?.price
-                        ? (parseFloat(sellUnits) * parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""))).toFixed(2)
-                        : "0")}
+                    <span className="text-gray-600">Units to sell:</span>
+                    <span className="text-gray-900 font-medium">
+                      {sellUnits || (sellDollarAmount && selectedProduct?.price
+                        ? (parseFloat(sellDollarAmount) / parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""))).toFixed(4)
+                        : "0.0000")}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-orange-700">Units to sell:</span>
-                    <span className="text-orange-900 font-medium">
-                      {sellUnits || "0"}
-                    </span>
-                  </div>
-                  <div className="text-xs text-orange-700">
-                    Before fees and taxes • Based on avg. cost {selectedProduct?.price?.replace(" Per Unit", "") || "$9.41"}
+                  <div className="text-xs text-gray-600">
+                    Before fees and taxes • Based on avg. cost {selectedProduct?.price || "$175.50"}
                   </div>
                 </div>
               </CardContent>
@@ -10555,28 +10803,33 @@ const ClientDetails = () => {
             </Button>
             <Button
               className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={!sellUnits || parseFloat(sellUnits) <= 0}
               onClick={() => {
-                // Generate order ID
-                const orderId = `ORD-${Date.now()}`;
-                const now = new Date();
-                const orderDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}, ${now.toLocaleTimeString()}`;
+                const price = selectedProduct?.price ? parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", "")) : 175.50;
+                const units = sellUnits || (sellDollarAmount
+                  ? (parseFloat(sellDollarAmount) / price).toFixed(4)
+                  : "0.0000");
+                const proceeds = sellDollarAmount || (sellUnits
+                  ? (parseFloat(sellUnits) * price).toFixed(2)
+                  : "0.00");
                 
-                const proceeds = sellDollarAmount || (sellUnits && selectedProduct?.price
-                  ? (parseFloat(sellUnits) * parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""))).toFixed(2)
-                  : "0");
+                const productName = selectedProduct?.product || "Apple Inc.";
+                const displayProductName = productName.includes(" - ") 
+                  ? productName 
+                  : productName.includes("AAPL") || productName.toLowerCase().includes("apple")
+                    ? `AAPL - ${productName.split(" Series")[0]}`
+                    : productName.split(" Series")[0] || productName;
                 
                 setSellOrderDetails({
-                  orderId,
-                  fund: selectedProduct?.product?.split(" Series")[0] || "FIDELITY NORTHSTAR FUND",
-                  plan: selectedPlan?.shortType || "RESP",
-                  units: sellUnits || "0",
-                  proceeds: `$${proceeds}`,
-                  time: orderDate,
+                  product: displayProductName,
+                  units: units,
+                  price: `$${price.toFixed(2)}`,
+                  totalProceeds: `$${parseFloat(proceeds).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
                 });
                 
                 setIsSellUnitsDialogOpen(false);
                 setIsSellOrderConfirmedDialogOpen(true);
-                setSellUnits("200");
+                setSellUnits("");
                 setSellDollarAmount("");
               }}
             >
@@ -10589,88 +10842,87 @@ const ClientDetails = () => {
       {/* Sell Order Confirmed Dialog */}
       <Dialog open={isSellOrderConfirmedDialogOpen} onOpenChange={setIsSellOrderConfirmedDialogOpen}>
         <DialogContent className="sm:max-w-[450px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-lg text-red-600">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-              Order Confirmed
-            </DialogTitle>
-            <DialogDescription className="text-sm text-gray-600 mt-2">
+          <DialogHeader className="text-center">
+            <div className="flex justify-center mb-2">
+              <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+                <CheckCircle2 className="h-6 w-6 text-red-600" />
+              </div>
+            </div>
+            <DialogTitle className="text-lg font-semibold text-center">Order Confirmation</DialogTitle>
+            <DialogDescription className="text-sm text-gray-600 mt-2 text-center">
               Your sell order has been placed successfully
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {/* Order Details */}
-            <Card className="border border-red-200 bg-red-50">
+            <Card className="border border-gray-200 bg-white">
               <CardContent className="p-4">
-                <p className="text-sm font-semibold text-red-800 mb-3">Order Details:</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-red-700">Order ID:</span>
-                    <span className="text-red-900 font-medium">{sellOrderDetails?.orderId || "ORD-1765758271439"}</span>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Product</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {sellOrderDetails?.product || "AAPL - Apple Inc."}
+                    </p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-red-700">Fund:</span>
-                    <span className="text-red-900 font-medium">{sellOrderDetails?.fund || "FIDELITY NORTHSTAR FUND"}</span>
+                  <div className="border-t border-gray-200 pt-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Units</p>
+                        <p className="text-sm font-medium text-gray-900">{sellOrderDetails?.units || "100.0000"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Price per Unit</p>
+                        <p className="text-sm font-medium text-gray-900">{sellOrderDetails?.price || "$175.50"}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-red-700">Plan:</span>
-                    <span className="text-red-900 font-medium">{sellOrderDetails?.plan || "RESP"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-red-700">Units to Sell:</span>
-                    <span className="text-red-900 font-medium">{sellOrderDetails?.units || "200"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-red-700">Estimated Proceeds:</span>
-                    <span className="text-red-900 font-medium">{sellOrderDetails?.proceeds || "$1882.00"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-red-700">Time:</span>
-                    <span className="text-red-900 font-medium">{sellOrderDetails?.time || "12/14/2025, 7:24:31 PM"}</span>
+                  <div className="border-t border-gray-200 pt-3">
+                    <div className="flex justify-between items-center">
+                      <p className="text-sm font-semibold text-gray-900">Total Proceeds</p>
+                      <p className="text-sm font-bold text-gray-900">{sellOrderDetails?.totalProceeds || "$17,550.00"}</p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
-
-            {/* Processing Status */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-700">Processing Status:</span>
-                <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 font-normal px-2 py-0.5 text-xs">
-                  Pending
-                </Badge>
-              </div>
-              <p className="text-xs text-blue-600">
-                Order will be processed at next market close
-              </p>
-            </div>
           </div>
           <DialogFooter>
             <Button
-              className="w-full bg-red-600 hover:bg-red-700 text-white"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               onClick={() => {
                 setIsSellOrderConfirmedDialogOpen(false);
                 setSellOrderDetails(null);
               }}
             >
-              Done
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Switch Fund Dialog */}
+      {/* Switch/Convert Fund Dialog */}
       <Dialog open={isSwitchDialogOpen} onOpenChange={setIsSwitchDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-lg text-blue-600">
-              <ArrowLeftRight className="h-5 w-5 text-blue-600" />
-              Switch Fund
-            </DialogTitle>
-            <DialogDescription className="text-sm text-gray-600 mt-2">
-              Switch from {selectedProduct?.product?.split(" Series")[0] || "FIDELITY NORTHSTAR FUND"} to another {getProductCompany(selectedProduct)} fund
-            </DialogDescription>
-          </DialogHeader>
+          {(() => {
+            const currentProductCompany = getProductCompany(selectedProduct);
+            const isSwitch = selectedFundCompany ? selectedFundCompany === currentProductCompany : true;
+            const isConvert = selectedFundCompany && selectedFundCompany !== currentProductCompany;
+            const titleText = isConvert ? "Convert Fund" : "Switch Fund";
+            const descriptionText = isConvert 
+              ? `Convert from ${selectedProduct?.product?.split(" Series")[0] || "FIDELITY NORTHSTAR FUND"} (${currentProductCompany}) to a ${selectedFundCompany || ""} fund.`
+              : `Switch from ${selectedProduct?.product?.split(" Series")[0] || "FIDELITY NORTHSTAR FUND"} to another ${currentProductCompany} fund.`;
+            
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle className={`flex items-center gap-2 text-lg ${isConvert ? "text-orange-600" : "text-blue-600"}`}>
+                    <ArrowLeftRight className={`h-5 w-5 ${isConvert ? "text-orange-600" : "text-blue-600"}`} />
+                    {titleText}
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-gray-600 mt-2">
+                    {descriptionText}
+                  </DialogDescription>
+                </DialogHeader>
           <div className="space-y-4 py-4">
             {/* Current Fund */}
             <Card className="border border-gray-200 bg-gray-50">
@@ -10709,51 +10961,63 @@ const ClientDetails = () => {
                     const search = e.target.value;
                     setCompanySearchTerm(search);
                   }}
-                  placeholder="Search fund companies (e.g., Fidelity, TD, CIBC)..."
+                  onFocus={() => {
+                    if (!companySearchTerm) {
+                      setCompanySearchTerm("");
+                    }
+                  }}
+                  placeholder="Select fund company"
                   className="pl-10"
                 />
               </div>
-              <div className="mt-2 space-y-1 max-h-48 overflow-y-auto">
-                {FUND_COMPANIES
-                  .filter((company) =>
-                    company.name.toLowerCase().includes(companySearchTerm.toLowerCase())
-                  )
-                  .map((company) => {
-                    const currentProductCompany = getProductCompany(selectedProduct);
-                    const isSameCompany = company.name === currentProductCompany;
-                    
-                    return (
-                      <Card
-                        key={company.id}
-                        className={`border cursor-pointer transition-colors ${
-                          selectedFundCompany === company.name
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-200 bg-gray-50 hover:bg-gray-100"
-                        }`}
-                        onClick={() => {
-                          setSelectedFundCompany(company.name);
-                          setCompanySearchTerm(company.name);
-                          
-                          // Check if it's the same company (switch) or different (convert)
-                          if (!isSameCompany) {
-                            // Different company - switch to convert dialog
-                            const currentFundToSwitch = selectedFundToSwitch;
-                            const currentUnits = unitsToSwitch;
-                            setIsSwitchDialogOpen(false);
-                            setSelectedFundToSwitch(currentFundToSwitch);
-                            setUnitsToSwitch(currentUnits);
-                            setIsConvertDialogOpen(true);
-                          }
-                        }}
-                      >
-                        <CardContent className="p-3">
-                          <p className="text-sm font-semibold text-gray-900">{company.name}</p>
-                          <p className="text-xs text-gray-600">{company.fundsCount} funds available</p>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-              </div>
+              {companySearchTerm && (
+                <div className="mt-2 space-y-1 max-h-64 overflow-y-auto">
+                  {FUND_COMPANIES
+                    .filter((company) =>
+                      company.name.toLowerCase().includes(companySearchTerm.toLowerCase())
+                    )
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((company) => {
+                      const currentProductCompany = getProductCompany(selectedProduct);
+                      const isSameCompany = company.name === currentProductCompany;
+                      
+                      return (
+                        <Card
+                          key={company.id}
+                          className={`border cursor-pointer transition-colors ${
+                            selectedFundCompany === company.name
+                              ? isSameCompany 
+                                ? "border-blue-500 bg-blue-50"
+                                : "border-orange-500 bg-orange-50"
+                              : "border-gray-200 bg-gray-50 hover:bg-gray-100"
+                          }`}
+                          onClick={() => {
+                            setSelectedFundCompany(company.name);
+                            setCompanySearchTerm(company.name);
+                            setSelectedFundToSwitch(""); // Reset fund selection when company changes
+                            setFundSearchTerm("");
+                          }}
+                        >
+                          <CardContent className="p-3 flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-semibold text-gray-900">{company.name}</p>
+                              <p className="text-xs text-gray-600">{company.fundsCount} funds available</p>
+                            </div>
+                            {isSameCompany ? (
+                              <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 font-normal px-2 py-0.5 text-xs">
+                                Switch
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100 font-normal px-2 py-0.5 text-xs">
+                                Convert
+                              </Badge>
+                            )}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                </div>
+              )}
             </div>
 
             {/* Select Fund to Convert to */}
@@ -10808,38 +11072,49 @@ const ClientDetails = () => {
               )}
             </div>
 
-            {/* Units to Switch */}
+            {/* Units to Switch/Convert */}
             <div>
               <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                Units to Switch
+                Units to {isConvert ? "Convert" : "Switch"}
               </label>
               <Input
                 type="number"
+                step="any"
                 value={unitsToSwitch}
                 onChange={(e) => setUnitsToSwitch(e.target.value)}
-                placeholder={`Max: ${selectedProduct?.units?.replace(" Units", "") || "1247.32"}`}
-                max={selectedProduct?.units?.replace(" Units", "") || "1247.32"}
+                placeholder={`Max: ${selectedProduct?.units || "600.00"}`}
+                max={parseFloat(selectedProduct?.units || "600.00")}
               />
             </div>
 
-            {/* Switch Preview */}
-            <Card className="border border-blue-200 bg-blue-50">
+            {/* Switch/Convert Preview */}
+            <Card className={`border ${isConvert ? "border-orange-200 bg-orange-50" : "border-blue-200 bg-blue-50"}`}>
               <CardContent className="p-4">
-                <p className="text-sm font-semibold text-blue-900 mb-3">Switch Preview:</p>
-                <p className="text-sm font-bold text-blue-900 mb-2">
-                  SWITCH - ({selectedProduct?.product?.split(" Series")[0] || "FIDELITY NORTHSTAR FUND"}) → ({selectedFundToSwitch || selectedFundCompany || "Fidelity Investments"})
-                </p>
-                <div className="space-y-1 text-sm text-blue-700">
-                  <div>Units to switch: {unitsToSwitch || "0"}</div>
-                  <div>
-                    Estimated value: $
-                    {unitsToSwitch && selectedProduct?.price
-                      ? (parseFloat(unitsToSwitch) * parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""))).toFixed(2)
-                      : "0.00"}
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge className={`${isConvert ? "bg-orange-200 text-orange-900" : "bg-blue-200 text-blue-900"} font-semibold px-2 py-0.5 text-xs`}>
+                    {isConvert ? "CONVERSION" : "SWITCH"}
+                  </Badge>
+                  <span className={`text-sm font-bold ${isConvert ? "text-orange-900" : "text-blue-900"}`}>
+                    ({selectedProduct?.product?.split(" Series")[0] || "Vanguard FTSE Canada All Cap Index ETF"}) → ({selectedFundToSwitch || selectedFundCompany || "Select fund"})
+                  </span>
+                </div>
+                <div className={`space-y-1 text-sm ${isConvert ? "text-orange-700" : "text-blue-700"}`}>
+                  <div className="flex justify-between">
+                    <span>Units to {isConvert ? "convert" : "switch"}:</span>
+                    <span className="font-medium">{unitsToSwitch || "0"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Estimated value:</span>
+                    <span className="font-medium">
+                      $
+                      {unitsToSwitch && selectedProduct?.price
+                        ? (parseFloat(unitsToSwitch) * parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""))).toFixed(2)
+                        : "0.00"}
+                    </span>
                   </div>
                 </div>
-                <p className="text-sm text-blue-600 mt-2">
-                  This will switch {selectedProduct?.product?.split(" Series")[0] || "FIDELITY NORTHSTAR FUND"} to {selectedFundToSwitch || selectedFundCompany || "Fidelity Investments"}
+                <p className={`text-sm mt-2 ${isConvert ? "text-orange-600" : "text-blue-600"}`}>
+                  This will {isConvert ? "convert" : "switch"} {selectedProduct?.product?.split(" Series")[0] || "Vanguard FTSE Canada All Cap Index ETF"} to {selectedFundToSwitch || selectedFundCompany || "selected fund"}
                 </p>
               </CardContent>
             </Card>
@@ -10859,28 +11134,33 @@ const ClientDetails = () => {
               Cancel
             </Button>
             <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className={`${isConvert ? "bg-orange-600 hover:bg-orange-700" : "bg-blue-600 hover:bg-blue-700"} text-white`}
+              disabled={!selectedFundCompany || !selectedFundToSwitch || !unitsToSwitch || parseFloat(unitsToSwitch) <= 0}
               onClick={() => {
-                const orderId = `ORD-${Date.now()}`;
-                const now = new Date();
-                const orderDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}, ${now.toLocaleTimeString()}`;
-                
                 const estimatedValue = unitsToSwitch && selectedProduct?.price
                   ? (parseFloat(unitsToSwitch) * parseFloat(selectedProduct.price.replace("$", "").replace(" Per Unit", ""))).toFixed(2)
                   : "0.00";
                 
-                setSwitchOrderDetails({
-                  orderId,
-                  from: selectedProduct?.product?.split(" Series")[0] || "FIDELITY NORTHSTAR FUND",
-                  to: selectedFundToSwitch || selectedFundCompany || "Fidelity Investments",
-                  plan: selectedPlan?.shortType || "RESP",
-                  units: unitsToSwitch || "0",
-                  estimatedValue: `$${estimatedValue}`,
-                  time: orderDate,
-                });
+                if (isConvert) {
+                  setConvertOrderDetails({
+                    from: selectedProduct?.product?.split(" Series")[0] || "FIDELITY NORTHSTAR FUND",
+                    to: selectedFundToSwitch || selectedFundCompany || "",
+                    units: unitsToSwitch || "0",
+                    estimatedValue: `$${estimatedValue}`,
+                  });
+                  setIsSwitchDialogOpen(false);
+                  setIsConvertOrderConfirmedDialogOpen(true);
+                } else {
+                  setSwitchOrderDetails({
+                    from: selectedProduct?.product?.split(" Series")[0] || "FIDELITY NORTHSTAR FUND",
+                    to: selectedFundToSwitch || selectedFundCompany || "",
+                    units: unitsToSwitch || "0",
+                    estimatedValue: `$${estimatedValue}`,
+                  });
+                  setIsSwitchDialogOpen(false);
+                  setIsSwitchOrderConfirmedDialogOpen(true);
+                }
                 
-                setIsSwitchDialogOpen(false);
-                setIsSwitchOrderConfirmedDialogOpen(true);
                 setSelectedFundCompany("");
                 setSelectedFundToSwitch("");
                 setUnitsToSwitch("");
@@ -10888,9 +11168,12 @@ const ClientDetails = () => {
                 setFundSearchTerm("");
               }}
             >
-              Execute Switch
+              Execute {isConvert ? "Conversion" : "Switch"}
             </Button>
           </DialogFooter>
+              </>
+            );
+          })()}
         </DialogContent>
       </Dialog>
 
@@ -10951,7 +11234,7 @@ const ClientDetails = () => {
               <div className="mt-2 space-y-1 max-h-48 overflow-y-auto">
                 {FUND_COMPANIES
                   .filter((company) =>
-                    company.name.toLowerCase().includes(companySearchTerm.toLowerCase())
+                    !companySearchTerm || company.name.toLowerCase().includes(companySearchTerm.toLowerCase())
                   )
                   .map((company) => {
                     const currentProductCompany = getProductCompany(selectedProduct);
@@ -11138,56 +11421,43 @@ const ClientDetails = () => {
       {/* Switch Order Confirmed Dialog */}
       <Dialog open={isSwitchOrderConfirmedDialogOpen} onOpenChange={setIsSwitchOrderConfirmedDialogOpen}>
         <DialogContent className="sm:max-w-[450px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-lg text-blue-600">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-              Switch Order Confirmed
-            </DialogTitle>
-            <DialogDescription className="text-sm text-gray-600 mt-2">
-              Your fund switch order has been placed successfully
+          <DialogHeader className="text-center">
+            <div className="flex justify-center mb-2">
+              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                <CheckCircle2 className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+            <DialogTitle className="text-lg font-semibold text-center">Switch Confirmation</DialogTitle>
+            <DialogDescription className="text-sm text-gray-600 mt-2 text-center">
+              Your switch order has been executed successfully
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {/* Switch Order Details */}
-            <Card className="border border-blue-200 bg-blue-50">
+            <Card className="border border-gray-200 bg-white">
               <CardContent className="p-4">
-                <p className="text-sm font-semibold text-blue-800 mb-3">Switch Order Details:</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">Order ID:</span>
-                    <span className="text-blue-900 font-medium">{switchOrderDetails?.orderId || "ORD-1765758488837"}</span>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">From Fund</p>
+                    <p className="text-sm font-semibold text-gray-900">{switchOrderDetails?.from || "Vanguard FTSE Canada All Cap Index ETF"}</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">From:</span>
-                    <span className="text-blue-900 font-medium">{switchOrderDetails?.from || "FIDELITY NORTHSTAR FUND"}</span>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">To Fund</p>
+                    <p className="text-sm font-semibold text-gray-900">{switchOrderDetails?.to || "Vanguard FTSE Canada All Cap Index ETF"}</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">To:</span>
-                    <span className="text-blue-900 font-medium">{switchOrderDetails?.to || "Fidelity Investments"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">Plan:</span>
-                    <span className="text-blue-900 font-medium">{switchOrderDetails?.plan || "RESP"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">Units to Switch:</span>
-                    <span className="text-blue-900 font-medium">{switchOrderDetails?.units || "1247.32"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">Time:</span>
-                    <span className="text-blue-900 font-medium">{switchOrderDetails?.time || "12/14/2025, 7:28:08 PM"}</span>
+                  <div className="border-t border-gray-200 pt-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Units Switched</p>
+                        <p className="text-sm font-medium text-gray-900">{switchOrderDetails?.units ? parseFloat(switchOrderDetails.units).toFixed(4) : "122.0000"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Estimated Value</p>
+                        <p className="text-sm font-medium text-gray-900">{switchOrderDetails?.estimatedValue || "$5,215.50"}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Processing Status */}
-            <Card className="border border-orange-200 bg-orange-50">
-              <CardContent className="p-4">
-                <p className="text-sm font-semibold text-orange-800 mb-2">Processing Status: Pending</p>
-                <p className="text-xs text-orange-700">
-                  Switch will be processed at next market close
-                </p>
               </CardContent>
             </Card>
           </div>
@@ -11199,7 +11469,7 @@ const ClientDetails = () => {
                 setSwitchOrderDetails(null);
               }}
             >
-              Done
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -11208,56 +11478,43 @@ const ClientDetails = () => {
       {/* Convert Order Confirmed Dialog */}
       <Dialog open={isConvertOrderConfirmedDialogOpen} onOpenChange={setIsConvertOrderConfirmedDialogOpen}>
         <DialogContent className="sm:max-w-[450px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-lg text-blue-600">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-              Conversion Order Confirmed
-            </DialogTitle>
-            <DialogDescription className="text-sm text-gray-600 mt-2">
-              Your fund conversion order has been placed successfully
+          <DialogHeader className="text-center">
+            <div className="flex justify-center mb-2">
+              <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center">
+                <CheckCircle2 className="h-6 w-6 text-orange-600" />
+              </div>
+            </div>
+            <DialogTitle className="text-lg font-semibold text-center">Conversion Confirmation</DialogTitle>
+            <DialogDescription className="text-sm text-gray-600 mt-2 text-center">
+              Your conversion order has been executed successfully
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {/* Conversion Order Details */}
-            <Card className="border border-blue-200 bg-blue-50">
+            <Card className="border border-gray-200 bg-white">
               <CardContent className="p-4">
-                <p className="text-sm font-semibold text-blue-800 mb-3">Conversion Order Details:</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">Order ID:</span>
-                    <span className="text-blue-900 font-medium">{convertOrderDetails?.orderId || "ORD-1765758488837"}</span>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">From Fund</p>
+                    <p className="text-sm font-semibold text-gray-900">{convertOrderDetails?.from || "Vanguard Canadian Aggregate Bond Index ETF"}</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">From:</span>
-                    <span className="text-blue-900 font-medium">{convertOrderDetails?.from || "FIDELITY NORTHSTAR FUND"}</span>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">To Fund</p>
+                    <p className="text-sm font-semibold text-gray-900">{convertOrderDetails?.to || "Fidelity Canadian Growth Fund"}</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">To:</span>
-                    <span className="text-blue-900 font-medium">{convertOrderDetails?.to || "CIBC Asset Management"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">Plan:</span>
-                    <span className="text-blue-900 font-medium">{convertOrderDetails?.plan || "RESP"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">Units to Convert:</span>
-                    <span className="text-blue-900 font-medium">{convertOrderDetails?.units || "1200"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">Time:</span>
-                    <span className="text-blue-900 font-medium">{convertOrderDetails?.time || "12/14/2025, 7:28:08 PM"}</span>
+                  <div className="border-t border-gray-200 pt-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Units Converted</p>
+                        <p className="text-sm font-medium text-gray-900">{convertOrderDetails?.units ? parseFloat(convertOrderDetails.units).toFixed(4) : "1111.0000"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Estimated Value</p>
+                        <p className="text-sm font-medium text-gray-900">{convertOrderDetails?.estimatedValue || "$30,163.65"}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Processing Status */}
-            <Card className="border border-orange-200 bg-orange-50">
-              <CardContent className="p-4">
-                <p className="text-sm font-semibold text-orange-800 mb-2">Processing Status: Pending</p>
-                <p className="text-xs text-orange-700">
-                  Conversion will be processed at next market close
-                </p>
               </CardContent>
             </Card>
           </div>
@@ -11269,7 +11526,7 @@ const ClientDetails = () => {
                 setConvertOrderDetails(null);
               }}
             >
-              Done
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
