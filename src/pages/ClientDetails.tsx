@@ -5998,7 +5998,8 @@ const ClientDetails = () => {
                   /* Transaction Details */
                   <div className="space-y-4">
                     <Tabs value={transactionDetailTab} onValueChange={setTransactionDetailTab}>
-                      <TabsList className="grid w-full grid-cols-7 h-8 mb-4">
+                      <TabsList className="grid w-full grid-cols-8 h-8 mb-4">
+                        <TabsTrigger value="summary" className="text-xs">Summary</TabsTrigger>
                         <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>
                         <TabsTrigger value="fundserv" className="text-xs">
                           Fundserv
@@ -6022,6 +6023,10 @@ const ClientDetails = () => {
                         </TabsTrigger>
                         <TabsTrigger value="related-transactions" className="text-xs">Related Transactions</TabsTrigger>
                       </TabsList>
+                      
+                      <TabsContent value="summary" className="mt-4">
+                        {/* Summary content - empty for now */}
+                      </TabsContent>
                       
                       <TabsContent value="details" className="mt-4">
                         <div className="space-y-4">
@@ -6485,7 +6490,8 @@ const ClientDetails = () => {
                   /* Fund Account Details */
                   <div className="space-y-4">
                     <Tabs defaultValue="details">
-                      <TabsList className="grid w-full grid-cols-7 h-8 mb-4">
+                      <TabsList className="grid w-full grid-cols-8 h-8 mb-4">
+                        <TabsTrigger value="summary" className="text-xs">Summary</TabsTrigger>
                         <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>
                         <TabsTrigger value="tools" className="text-xs">Tools</TabsTrigger>
                         <TabsTrigger value="notes" className="text-xs">
@@ -6509,6 +6515,10 @@ const ClientDetails = () => {
                           <HelpCircle className="h-3 w-3 ml-1" />
                         </TabsTrigger>
                       </TabsList>
+                      
+                      <TabsContent value="summary" className="mt-4">
+                        {/* Summary content - empty for now */}
+                      </TabsContent>
                       
                       <TabsContent value="details" className="mt-4">
                         <div className="space-y-4">
@@ -7395,7 +7405,8 @@ const ClientDetails = () => {
                   <TabsContent value="details" className="mt-4">
                     {/* Details Sub-tabs */}
                     <Tabs value={planDetailsSubTab} onValueChange={setPlanDetailsSubTab}>
-                      <TabsList className="grid w-full grid-cols-6 h-8 mb-4">
+                      <TabsList className="grid w-full grid-cols-7 h-8 mb-4">
+                        <TabsTrigger value="summary" className="text-xs">Summary</TabsTrigger>
                         <TabsTrigger value="details" className="text-xs">
                           Details
                           <HelpCircle className="h-3 w-3 ml-1" />
@@ -7406,6 +7417,10 @@ const ClientDetails = () => {
                         <TabsTrigger value="supplier-accounts" className="text-xs">Supplier Accounts</TabsTrigger>
                         <TabsTrigger value="custom-compensation" className="text-xs">Custom Compensation</TabsTrigger>
                       </TabsList>
+
+                      <TabsContent value="summary" className="mt-4">
+                        {/* Summary content - empty for now */}
+                      </TabsContent>
 
                       <TabsContent value="details" className="mt-4">
                         <div className="grid grid-cols-2 gap-4">
