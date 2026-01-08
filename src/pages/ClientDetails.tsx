@@ -5820,16 +5820,18 @@ const ClientDetails = () => {
 
                 {/* Account Tabs */}
                 <Tabs value={accountViewType} onValueChange={(value) => setAccountViewType(value as "fund-accounts" | "gics")}>
-                  <TabsList className="grid w-full grid-cols-2 h-8">
-                    <TabsTrigger value="fund-accounts" className="text-xs">
-                      Fund Accounts
-                      <HelpCircle className="h-3 w-3 ml-1" />
-                    </TabsTrigger>
-                    <TabsTrigger value="gics" className="text-xs">
-                      GICs
-                      <HelpCircle className="h-3 w-3 ml-1" />
-                    </TabsTrigger>
-                  </TabsList>
+                  <div className="w-full overflow-x-auto overflow-y-visible mb-4 min-w-0">
+                    <TabsList className="inline-flex h-auto p-1 gap-8 min-w-full w-max">
+                      <TabsTrigger value="fund-accounts" className="text-xs whitespace-nowrap flex-shrink-0">
+                        Fund Accounts
+                        <HelpCircle className="h-3 w-3 ml-1" />
+                      </TabsTrigger>
+                      <TabsTrigger value="gics" className="text-xs whitespace-nowrap flex-shrink-0">
+                        GICs
+                        <HelpCircle className="h-3 w-3 ml-1" />
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
 
                   <TabsContent value="fund-accounts" className="mt-4">
                     <div className="flex items-center gap-2 mb-3">
@@ -5998,31 +6000,33 @@ const ClientDetails = () => {
                   /* Transaction Details */
                   <div className="space-y-4">
                     <Tabs value={transactionDetailTab} onValueChange={setTransactionDetailTab}>
-                      <TabsList className="grid w-full grid-cols-8 h-8 mb-4">
-                        <TabsTrigger value="summary" className="text-xs">Summary</TabsTrigger>
-                        <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>
-                        <TabsTrigger value="fundserv" className="text-xs">
-                          Fundserv
-                          <HelpCircle className="h-3 w-3 ml-1" />
-                        </TabsTrigger>
-                        <TabsTrigger value="payment-instructions" className="text-xs">
-                          Payment Instructions
-                          <HelpCircle className="h-3 w-3 ml-1" />
-                        </TabsTrigger>
-                        <TabsTrigger value="notes" className="text-xs">
-                          Notes
-                          <HelpCircle className="h-3 w-3 ml-1" />
-                        </TabsTrigger>
-                        <TabsTrigger value="attachments" className="text-xs">
-                          Attachments
-                          <HelpCircle className="h-3 w-3 ml-1" />
-                        </TabsTrigger>
-                        <TabsTrigger value="reviews" className="text-xs">
-                          Reviews
-                          <HelpCircle className="h-3 w-3 ml-1" />
-                        </TabsTrigger>
-                        <TabsTrigger value="related-transactions" className="text-xs">Related Transactions</TabsTrigger>
-                      </TabsList>
+                      <div className="w-full overflow-x-auto overflow-y-visible mb-4 min-w-0">
+                        <TabsList className="inline-flex h-auto p-1 gap-6 min-w-full w-max">
+                          <TabsTrigger value="summary" className="text-xs whitespace-nowrap flex-shrink-0">Summary</TabsTrigger>
+                          <TabsTrigger value="details" className="text-xs whitespace-nowrap flex-shrink-0">Details</TabsTrigger>
+                          <TabsTrigger value="fundserv" className="text-xs whitespace-nowrap flex-shrink-0">
+                            Fundserv
+                            <HelpCircle className="h-3 w-3 ml-1" />
+                          </TabsTrigger>
+                          <TabsTrigger value="payment-instructions" className="text-xs whitespace-nowrap flex-shrink-0">
+                            Payment Instructions
+                            <HelpCircle className="h-3 w-3 ml-1" />
+                          </TabsTrigger>
+                          <TabsTrigger value="notes" className="text-xs whitespace-nowrap flex-shrink-0">
+                            Notes
+                            <HelpCircle className="h-3 w-3 ml-1" />
+                          </TabsTrigger>
+                          <TabsTrigger value="attachments" className="text-xs whitespace-nowrap flex-shrink-0">
+                            Attachments
+                            <HelpCircle className="h-3 w-3 ml-1" />
+                          </TabsTrigger>
+                          <TabsTrigger value="reviews" className="text-xs whitespace-nowrap flex-shrink-0">
+                            Reviews
+                            <HelpCircle className="h-3 w-3 ml-1" />
+                          </TabsTrigger>
+                          <TabsTrigger value="related-transactions" className="text-xs whitespace-nowrap flex-shrink-0">Related Transactions</TabsTrigger>
+                        </TabsList>
+                      </div>
                       
                       <TabsContent value="summary" className="mt-4">
                         {/* Summary content - empty for now */}
@@ -6490,31 +6494,33 @@ const ClientDetails = () => {
                   /* Fund Account Details */
                   <div className="space-y-4">
                     <Tabs defaultValue="summary">
-                      <TabsList className="grid w-full grid-cols-8 h-8 mb-4">
-                        <TabsTrigger value="summary" className="text-xs">Summary</TabsTrigger>
-                        <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>
-                        <TabsTrigger value="tools" className="text-xs">Tools</TabsTrigger>
-                        <TabsTrigger value="notes" className="text-xs">
-                          Notes
-                          <HelpCircle className="h-3 w-3 ml-1" />
-                        </TabsTrigger>
-                        <TabsTrigger value="attachments" className="text-xs">
-                          Attachments
-                          <HelpCircle className="h-3 w-3 ml-1" />
-                        </TabsTrigger>
-                        <TabsTrigger value="allocations" className="text-xs">
-                          Allocations
-                          <HelpCircle className="h-3 w-3 ml-1" />
-                        </TabsTrigger>
-                        <TabsTrigger value="product-documents-delivery" className="text-xs">
-                          Product Documents Delivery
-                          <HelpCircle className="h-3 w-3 ml-1" />
-                        </TabsTrigger>
-                        <TabsTrigger value="price-history" className="text-xs">
-                          Price History
-                          <HelpCircle className="h-3 w-3 ml-1" />
-                        </TabsTrigger>
-                      </TabsList>
+                      <div className="w-full overflow-x-auto overflow-y-visible mb-4 min-w-0">
+                        <TabsList className="inline-flex h-auto p-1 gap-6 min-w-full w-max">
+                          <TabsTrigger value="summary" className="text-xs whitespace-nowrap flex-shrink-0">Summary</TabsTrigger>
+                          <TabsTrigger value="details" className="text-xs whitespace-nowrap flex-shrink-0">Details</TabsTrigger>
+                          <TabsTrigger value="tools" className="text-xs whitespace-nowrap flex-shrink-0">Tools</TabsTrigger>
+                          <TabsTrigger value="notes" className="text-xs whitespace-nowrap flex-shrink-0">
+                            Notes
+                            <HelpCircle className="h-3 w-3 ml-1" />
+                          </TabsTrigger>
+                          <TabsTrigger value="attachments" className="text-xs whitespace-nowrap flex-shrink-0">
+                            Attachments
+                            <HelpCircle className="h-3 w-3 ml-1" />
+                          </TabsTrigger>
+                          <TabsTrigger value="allocations" className="text-xs whitespace-nowrap flex-shrink-0">
+                            Allocations
+                            <HelpCircle className="h-3 w-3 ml-1" />
+                          </TabsTrigger>
+                          <TabsTrigger value="product-documents-delivery" className="text-xs whitespace-nowrap flex-shrink-0">
+                            Product Documents Delivery
+                            <HelpCircle className="h-3 w-3 ml-1" />
+                          </TabsTrigger>
+                          <TabsTrigger value="price-history" className="text-xs whitespace-nowrap flex-shrink-0">
+                            Price History
+                            <HelpCircle className="h-3 w-3 ml-1" />
+                          </TabsTrigger>
+                        </TabsList>
+                      </div>
                       
                       <TabsContent value="summary" className="mt-4">
                         {/* Summary content - empty for now */}
