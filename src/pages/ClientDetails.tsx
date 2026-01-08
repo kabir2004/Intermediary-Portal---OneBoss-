@@ -3489,9 +3489,9 @@ const ClientDetails = () => {
         {clientViewTab === "summary" && (
           <>
             {/* Information Cards */}
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {/* Residential Address Card */}
-          <Card className="border border-gray-200 shadow-sm bg-white col-span-2">
+          <Card className="border border-gray-200 shadow-sm bg-white col-span-1 sm:col-span-1 lg:col-span-2">
             <CardHeader className="pb-3 relative pr-2">
               <CardTitle className="text-sm font-semibold text-gray-900">Residential Address</CardTitle>
               {clientDetails.mailingAddress && (
@@ -3510,8 +3510,8 @@ const ClientDetails = () => {
                 </Tooltip>
               )}
             </CardHeader>
-            <CardContent className="pt-0 pb-0 pr-2">
-              <p className="text-sm text-gray-700 whitespace-nowrap pr-6">
+            <CardContent className="pt-0 pb-0 pr-2 overflow-hidden min-w-0">
+              <p className="text-xs text-gray-700 break-words pr-6 min-w-0">
                 {clientDetails.residentialAddress.line1}
                 {clientDetails.residentialAddress.line2 && `, ${clientDetails.residentialAddress.line2}`}
                 {clientDetails.residentialAddress.line3 && `, ${clientDetails.residentialAddress.line3}`}
